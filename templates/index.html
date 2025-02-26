@@ -54,7 +54,7 @@
         }
         
         .table th {
-            color: var(--text-muted);
+            color: var (--text-muted);
             border-color: #2a3543;
         }
         
@@ -95,7 +95,7 @@
         }
         
         .button.is-success {
-            background-color: var (--success);
+            background-color: var(--success);
         }
         
         .button.is-warning {
@@ -178,19 +178,206 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #4e5d78;
         }
+        
+        /* New and enhanced styles */
+        .dashboard-header {
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .time-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+        
+        .coin-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #2a3543;
+            transition: background-color 0.2s;
+        }
+        
+        .coin-item:hover {
+            background-color: var(--bg-dark-secondary);
+        }
+        
+        .coin-item:last-child {
+            border-bottom: none;
+        }
+        
+        .coin-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 12px;
+            background-color: var(--bg-dark-secondary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .coin-name {
+            font-weight: 600;
+            flex: 0 0 100px;
+        }
+        
+        .coin-price {
+            flex: 0 0 100px;
+            text-align: right;
+        }
+        
+        .coin-indicator {
+            flex: 0 0 80px;
+            text-align: right;
+        }
+        
+        .coin-signal {
+            flex: 0 0 80px;
+            text-align: center;
+        }
+        
+        .flash-change {
+            animation: flash-animation 1s ease-out;
+        }
+        
+        @keyframes flash-animation {
+            0% { background-color: rgba(83, 103, 254, 0.3); }
+            100% { background-color: transparent; }
+        }
+        
+        .coin-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .condition-header {
+            padding: 0.75rem 1rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            border-bottom: 1px solid #2a3543;
+            display: flex;
+            align-items: center;
+        }
+        
+        .condition-header .coin-name {
+            flex: 0 0 100px;
+        }
+        
+        .condition-header .coin-price {
+            flex: 0 0 100px;
+            text-align: right;
+        }
+        
+        .condition-header .coin-indicator {
+            flex: 0 0 80px;
+            text-align: right;
+        }
+        
+        .condition-header .coin-signal {
+            flex: 0 0 80px;
+            text-align: center;
+        }
+        
+        .dashboard-card {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .dashboard-card .card-content {
+            flex-grow: 1;
+        }
+        
+        .top-coins-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+        
+        .top-coin-badge {
+            background-color: var(--bg-dark-secondary);
+            border: 1px solid #2a3543;
+            border-radius: 16px;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+        
+        .top-coin-badge:hover {
+            background-color: var(--accent);
+            cursor: pointer;
+        }
+        
+        .refresh-button {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+        
+        .refresh-button:hover {
+            color: var(--text-light);
+            background-color: var(--bg-dark-secondary);
+        }
+        
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 6px;
+        }
+        
+        .status-indicator.active {
+            background-color: var(--success);
+            box-shadow: 0 0 8px var(--success);
+        }
+        
+        .status-indicator.inactive {
+            background-color: var(--danger);
+        }
+        
+        .bot-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .data-loading {
+            opacity: 0.7;
+        }
     </style>
 </head>
 <body>
     <section class="section">
         <div class="container">
-            <h1 class="title has-text-centered has-text-light mb-6">
-                Tradox - Binance Crypto Trading Bot
-                {% if simulation_mode %}
-                <span class="tag is-medium simulation-tag ml-2">SIMULATION</span>
-                {% else %}
-                <span class="tag is-medium live-tag ml-2">LIVE TRADING</span>
-                {% endif %}
-            </h1>
+            <div class="dashboard-header">
+                <h1 class="title has-text-light">
+                    Tradox - Crypto Trading Bot
+                    {% if simulation_mode %}
+                    <span class="tag is-medium simulation-tag ml-2">SIMULATION</span>
+                    {% else %}
+                    <span class="tag is-medium live-tag ml-2">LIVE TRADING</span>
+                    {% endif %}
+                </h1>
+                
+                <div class="bot-info">
+                    <div class="mr-4">
+                        <span class="status-indicator {% if bot_status %}active{% else %}inactive{% endif %}"></span>
+                        <span id="bot-status-text">{% if bot_status %}Running{% else %}Stopped{% endif %}</span>
+                    </div>
+                    <div id="current-time" class="has-text-grey mr-2"></div>
+                </div>
+            </div>
             
             {% with messages = get_flashed_messages() %}
                 {% if messages %}
@@ -232,15 +419,6 @@
                         <div class="column is-half">
                             <div class="box" style="background-color: var(--bg-dark-secondary); color: var(--text-light);">
                                 <h5 class="title is-5 has-text-light">Bot Status</h5>
-                                <div class="level">
-                                    <div class="level-left">
-                                        <p>Status: 
-                                            <span id="bot-status" class="tag {% if bot_status %}is-success{% else %}is-danger{% endif %}">
-                                                {% if bot_status %}Running{% else %}Stopped{% endif %}
-                                            </span>
-                                        </p>
-                                    </div>
-                                </div>
                                 
                                 <div class="buttons">
                                     <form action="/stop" method="post" class="mr-2">
@@ -263,101 +441,93 @@
             </div>
             
             <div class="columns">
+                <!-- Left Column -->
                 <div class="column is-half">
-                    <div class="card mb-5">
+                    <!-- Open Positions Card -->
+                    <div class="card mb-5 dashboard-card">
                         <header class="card-header">
                             <p class="card-header-title">
                                 <i class="fas fa-chart-line mr-2"></i> Open Positions (Max: 2)
                             </p>
+                            <button class="refresh-button" onclick="updatePositions()">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
                         </header>
                         <div class="card-content">
                             <div id="positions-container">
-                                {% if positions %}
-                                    {% for position in positions %}
-                                        <div class="position-box">
-                                            <h4 class="title is-4 has-text-light">{{ position.symbol }}</h4>
-                                            <div class="columns is-mobile">
-                                                <div class="column">
-                                                    <p><strong>Entry:</strong> {{ position.entry_price }}</p>
-                                                    <p><strong>Current:</strong> {{ position.current_price }}</p>
-                                                </div>
-                                                <div class="column">
-                                                    <p><strong>Quantity:</strong> {{ position.quantity }}</p>
-                                                    <p>
-                                                        <strong>Profit:</strong> 
-                                                        <span class="{% if position.profit_pct >= 0 %}profit{% else %}loss{% endif %}">
-                                                            {{ "%.2f"|format(position.profit_pct) }}%
-                                                        </span>
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <p><strong>Entry Time:</strong> {{ position.entry_time }}</p>
-                                        </div>
-                                    {% endfor %}
-                                {% else %}
-                                    <div class="has-text-centered p-5">
-                                        <i class="fas fa-search fa-3x has-text-grey-lighter mb-3"></i>
-                                        <p class="has-text-grey-light">No open positions</p>
-                                    </div>
-                                {% endif %}
+                                <!-- Will be populated via JavaScript -->
+                                <div class="has-text-centered p-5">
+                                    <i class="fas fa-spinner fa-pulse fa-3x has-text-grey-lighter mb-3"></i>
+                                    <p class="has-text-grey-light">Loading positions...</p>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="card mb-5">
+                    <!-- Performance Stats Card -->
+                    <div class="card mb-5 dashboard-card">
                         <header class="card-header">
                             <p class="card-header-title">
                                 <i class="fas fa-chart-bar mr-2"></i> Performance Statistics
                             </p>
+                            <button class="refresh-button" onclick="updateStats()">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
                         </header>
                         <div class="card-content">
                             <div id="stats-container">
-                                <table class="table is-fullwidth">
-                                    <tbody>
-                                        <tr>
-                                            <th>Total Trades</th>
-                                            <td>{{ stats.total_trades }}</td>
-                                        </tr>
-                                        <tr>
-                                            <th>Winning Trades</th>
-                                            <td>{{ stats.winning_trades }}</td>
-                                        </tr>
-                                        <tr>
-                                            <th>Losing Trades</th>
-                                            <td>{{ stats.losing_trades }}</td>
-                                        </tr>
-                                        <tr>
-                                            <th>Win Rate</th>
-                                            <td>{{ "%.2f"|format(stats.win_rate) }}%</td>
-                                        </tr>
-                                        <tr>
-                                            <th>Total Profit</th>
-                                            <td class="{% if stats.total_profit_pct >= 0 %}profit{% else %}loss{% endif %}">
-                                                {{ "%.2f"|format(stats.total_profit_pct) }}%
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <th>Avg. Profit/Trade</th>
-                                            <td class="{% if stats.average_profit_per_trade >= 0 %}profit{% else %}loss{% endif %}">
-                                                {{ "%.2f"|format(stats.average_profit_per_trade) }}%
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                                <!-- Will be populated via JavaScript -->
+                                <div class="has-text-centered p-5">
+                                    <i class="fas fa-spinner fa-pulse fa-3x has-text-grey-lighter mb-3"></i>
+                                    <p class="has-text-grey-light">Loading stats...</p>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 
+                <!-- Right Column -->
                 <div class="column is-half">
-                    <div class="card mb-5">
+                    <!-- Entry Conditions Card -->
+                    <div class="card mb-5 dashboard-card">
+                        <header class="card-header">
+                            <p class="card-header-title">
+                                <i class="fas fa-search mr-2"></i> Entry Signal Monitor
+                            </p>
+                            <button class="refresh-button" onclick="updateEntryConditions()">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
+                        </header>
+                        <div class="card-content p-0">
+                            <div class="condition-header">
+                                <div class="coin-name">Symbol</div>
+                                <div class="coin-price">Price</div>
+                                <div class="coin-indicator">RSI</div>
+                                <div class="coin-indicator">MACD</div>
+                                <div class="coin-signal">Signal</div>
+                            </div>
+                            <div class="coin-list" id="conditions-container">
+                                <!-- Will be populated via JavaScript -->
+                                <div class="has-text-centered p-5">
+                                    <i class="fas fa-spinner fa-pulse fa-3x has-text-grey-lighter mb-3"></i>
+                                    <p class="has-text-grey-light">Loading market data...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Trade History Card -->
+                    <div class="card mb-5 dashboard-card">
                         <header class="card-header">
                             <p class="card-header-title">
                                 <i class="fas fa-history mr-2"></i> Trade History
                             </p>
+                            <button class="refresh-button" onclick="updateHistory()">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
                         </header>
-                        <div class="card-content p-0 trade-history">
-                            <div id="history-container">
+                        <div class="card-content p-0">
+                            <div class="trade-history">
                                 <table class="table is-fullwidth is-striped">
                                     <thead>
                                         <tr>
@@ -369,7 +539,13 @@
                                         </tr>
                                     </thead>
                                     <tbody id="history-tbody">
-                                        <!-- Will be populated via AJAX -->
+                                        <!-- Will be populated via JavaScript -->
+                                        <tr>
+                                            <td colspan="5" class="has-text-centered">
+                                                <i class="fas fa-spinner fa-pulse mr-2"></i>
+                                                Loading history...
+                                            </td>
+                                        </tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -382,6 +558,24 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
+        // Global object to store the latest entry conditions by symbol
+        const latestConditions = {};
+        
+        // Format current time
+        function updateCurrentTime() {
+            const now = new Date();
+            const options = { 
+                weekday: 'short', 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric', 
+                hour: '2-digit', 
+                minute: '2-digit',
+                second: '2-digit'
+            };
+            $('#current-time').text(now.toLocaleString('en-US', options));
+        }
+        
         // Close notification on delete button click
         document.addEventListener('DOMContentLoaded', () => {
             (document.querySelectorAll('.notification .delete') || []).forEach(($delete) => {
@@ -390,11 +584,17 @@
                     $notification.parentNode.removeChild($notification);
                 });
             });
+            
+            // Update time initially
+            updateCurrentTime();
+            // Update time every second
+            setInterval(updateCurrentTime, 1000);
         });
         
-        // Update positions and statistics
-        function updateData() {
-            // Update positions
+        // Update open positions
+        function updatePositions() {
+            $('#positions-container').addClass('data-loading');
+            
             $.get('/positions', function(data) {
                 let positionsHtml = '';
                 
@@ -433,9 +633,14 @@
                 }
                 
                 $('#positions-container').html(positionsHtml);
+                $('#positions-container').removeClass('data-loading');
             });
+        }
+        
+        // Update statistics
+        function updateStats() {
+            $('#stats-container').addClass('data-loading');
             
-            // Update statistics
             $.get('/stats', function(data) {
                 const totalProfitClass = data.total_profit_pct >= 0 ? 'profit' : 'loss';
                 const avgProfitClass = data.average_profit_per_trade >= 0 ? 'profit' : 'loss';
@@ -472,9 +677,14 @@
                 `;
                 
                 $('#stats-container').html(statsHtml);
+                $('#stats-container').removeClass('data-loading');
             });
+        }
+        
+        // Update trade history
+        function updateHistory() {
+            $('#history-tbody').addClass('data-loading');
             
-            // Update trade history
             $.get('/history', function(data) {
                 let historyHtml = '';
                 
@@ -485,7 +695,7 @@
                         </tr>
                     `;
                 } else {
-                    data.reverse().forEach(function(trade) {
+                    data.slice().reverse().forEach(function(trade) {
                         const profitClass = trade.profit_pct >= 0 ? 'profit' : 'loss';
                         historyHtml += `
                             <tr>
@@ -500,13 +710,94 @@
                 }
                 
                 $('#history-tbody').html(historyHtml);
+                $('#history-tbody').removeClass('data-loading');
             });
         }
         
-        // Update every 10 seconds if bot is running
-        const botStatus = JSON.parse('{{ bot_status|tojson|safe }}');
+        // Update entry conditions with persistent coin display
+        function updateEntryConditions() {
+            $('#conditions-container').addClass('data-loading');
+            
+            $.get('/entry-conditions', function(data) {
+                if (data.length === 0) {
+                    $('#conditions-container').html(`
+                        <div class="has-text-centered p-5">
+                            <p class="has-text-grey-light">No scan results yet</p>
+                        </div>
+                    `);
+                    $('#conditions-container').removeClass('data-loading');
+                    return;
+                }
+                
+                // Process the entry conditions by symbol
+                data.forEach(function(check) {
+                    // Add or update condition in our tracking object
+                    latestConditions[check.symbol] = {
+                        time: check.time,
+                        price: check.conditions.price,
+                        rsi: check.conditions.rsi,
+                        macd_histogram: check.conditions.macd_histogram,
+                        prev_macd_histogram: check.conditions.prev_macd_histogram,
+                        rsi_condition: check.conditions.rsi_condition,
+                        macd_condition: check.conditions.macd_condition,
+                        entry_signal: check.entry_signal,
+                        updated: true  // Mark as updated in this cycle
+                    };
+                });
+                
+                // Generate HTML for the conditions
+                let conditionsHtml = '';
+                
+                // Sort coins by entry signal (true first) then by symbol
+                const sortedSymbols = Object.keys(latestConditions).sort((a, b) => {
+                    if (latestConditions[b].entry_signal !== latestConditions[a].entry_signal) {
+                        return latestConditions[b].entry_signal - latestConditions[a].entry_signal;
+                    }
+                    return a.localeCompare(b);
+                });
+                
+                sortedSymbols.forEach(function(symbol) {
+                    const condition = latestConditions[symbol];
+                    const signalClass = condition.entry_signal ? 'is-success' : '';
+                    const rsiClass = condition.rsi_condition ? 'has-text-success' : '';
+                    const macdClass = condition.macd_condition ? 'has-text-success' : '';
+                    const flashClass = condition.updated ? 'flash-change' : '';
+                    
+                    // Clear the updated flag for next time
+                    condition.updated = false;
+                    
+                    conditionsHtml += `
+                        <div class="coin-item ${flashClass} ${signalClass}">
+                            <div class="coin-name">${symbol}</div>
+                            <div class="coin-price">${condition.price.toFixed(4)}</div>
+                            <div class="coin-indicator ${rsiClass}">${condition.rsi.toFixed(1)}</div>
+                            <div class="coin-indicator ${macdClass}">${condition.macd_histogram.toFixed(6)}</div>
+                            <div class="coin-signal">
+                                ${condition.entry_signal ? 
+                                    '<span class="tag is-success is-light">BUY</span>' : 
+                                    '<span class="tag is-light">NO</span>'}
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                $('#conditions-container').html(conditionsHtml);
+                $('#conditions-container').removeClass('data-loading');
+            });
+        }
+        
+        // Update all data
+        function updateData() {
+            updatePositions();
+            updateStats();
+            updateHistory();
+            updateEntryConditions();
+        }
+        
+        // Update every 5 seconds if bot is running
+        const botStatus = {{ bot_status|tojson|safe }};
         if (botStatus) {
-            setInterval(updateData, 10000);
+            setInterval(updateData, 5000);
         }
         
         // Initial data load

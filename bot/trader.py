@@ -30,13 +30,50 @@ class TradingBot:
         self.total_profit_pct = 0.0
         self.trade_history = []
         
+        # Store entry condition results
+        self.entry_condition_results = []
+        self.max_condition_results = 100  # Keep last 100 results
+        
+        # Get top 50 coins by default
+        self.get_top_coins(50)
+        
         # Verify connection to Binance
         try:
             self.client.ping()
             print("Successfully connected to Binance API!")
         except Exception as e:
             print(f"Warning: Could not connect to Binance API: {e}")
-        
+    
+    def get_top_coins(self, limit=50):
+        """Get top coins by market cap from Binance"""
+        try:
+            # Get ticker for all USDT pairs
+            tickers = self.client.get_ticker()
+            usdt_tickers = [t for t in tickers if t['symbol'].endswith('USDT')]
+            
+            # Sort by 24h volume (highest first)
+            sorted_tickers = sorted(usdt_tickers, key=lambda x: float(x['quoteVolume']), reverse=True)
+            
+            # Extract top coins (removing USDT suffix)
+            top_coins = []
+            for ticker in sorted_tickers[:limit]:
+                symbol = ticker['symbol']
+                if symbol.endswith('USDT'):
+                    base_symbol = symbol[:-4]  # Remove USDT
+                    # Skip stablecoins and certain tokens
+                    if base_symbol not in ['USDC', 'BUSD', 'TUSD', 'DAI', 'USDP']:
+                        top_coins.append(base_symbol)
+            
+            self.coins = top_coins[:limit]
+            print(f"Loaded top {len(self.coins)} coins: {', '.join(self.coins[:10])}...")
+            return self.coins
+        except Exception as e:
+            print(f"Error getting top coins: {e}")
+            # Fallback to a default list of popular coins
+            self.coins = ['BTC', 'ETH', 'BNB', 'XRP', 'ADA', 'SOL', 'DOT', 'DOGE', 'AVAX', 'SHIB']
+            print(f"Using default coin list: {', '.join(self.coins)}")
+            return self.coins
+    
     def set_coins(self, coins):
         """Set list of coins to trade"""
         self.coins = coins
@@ -48,6 +85,8 @@ class TradingBot:
             print(f"Maximum positions ({self.max_positions}) reached. Skipping scan.")
             return
         
+        scan_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        
         for coin in self.coins:
             symbol = f"{coin}USDT"
             
@@ -56,13 +95,30 @@ class TradingBot:
                 continue
                 
             try:
-                # Check if we should enter a position
-                if self._check_entry_conditions(symbol):
+                # Check entry conditions and store results
+                entry_signal, conditions = self._check_entry_conditions(symbol)
+                
+                # Record entry condition check
+                result = {
+                    'time': scan_time,
+                    'symbol': symbol,
+                    'entry_signal': entry_signal,
+                    'conditions': conditions
+                }
+                
+                # Store results (limit to max_condition_results)
+                self.entry_condition_results.append(result)
+                if len(self.entry_condition_results) > self.max_condition_results:
+                    self.entry_condition_results.pop(0)
+                
+                # Enter position if conditions met
+                if entry_signal:
                     self._enter_position(symbol)
                     
                     # Stop scanning if max positions reached
                     if len(self.open_positions) >= self.max_positions:
                         break
+                        
             except Exception as e:
                 print(f"Error scanning {symbol}: {e}")
         
@@ -107,21 +163,27 @@ class TradingBot:
         
         # Get latest values
         current_rsi = df['rsi'].iloc[-1]
+        current_price = df['close'].iloc[-1]
         macd_histogram = df['macd_histogram'].iloc[-1]
         prev_macd_histogram = df['macd_histogram'].iloc[-2]
         
         # Entry condition: RSI < 30 (oversold) and MACD histogram turning positive
-        entry_condition = (
-            current_rsi < 30 and 
-            macd_histogram > 0 and 
-            prev_macd_histogram < 0
-        )
+        rsi_condition = current_rsi < 30
+        macd_condition = macd_histogram > 0 and prev_macd_histogram < 0
         
-        # Print debug info when entry condition is met
-        if entry_condition:
-            print(f"Entry signal for {symbol}: RSI={current_rsi:.2f}, MACD Hist={macd_histogram:.6f}")
+        entry_condition = rsi_condition and macd_condition
         
-        return entry_condition
+        # Create conditions dict to return
+        conditions = {
+            'price': current_price,
+            'rsi': current_rsi,
+            'rsi_condition': rsi_condition,
+            'macd_histogram': macd_histogram,
+            'prev_macd_histogram': prev_macd_histogram,
+            'macd_condition': macd_condition
+        }
+        
+        return entry_condition, conditions
     
     def _check_exit_conditions(self):
         """Check if any positions should be closed"""
@@ -258,7 +320,10 @@ class TradingBot:
     def get_open_positions(self):
         """Return list of open positions"""
         result = []
-        for symbol, data in self.open_positions.items():
+        # Create a copy of positions dictionary to avoid modification during iteration
+        positions_copy = dict(self.open_positions)
+        
+        for symbol, data in positions_copy.items():
             try:
                 # Get current price from Binance
                 ticker = self.client.get_ticker(symbol=symbol)
@@ -299,3 +364,31 @@ class TradingBot:
     def get_trade_history(self):
         """Return trade history"""
         return self.trade_history
+    
+    def get_entry_conditions(self):
+        """Return the entry condition check results with JSON serializable data"""
+        results = []
+        
+        for result in self.entry_condition_results:
+            # Create a copy with serializable values
+            serializable_result = {
+                'time': result['time'],
+                'symbol': result['symbol'],
+                'entry_signal': bool(result['entry_signal']),  # Convert to Python bool
+                'conditions': {
+                    'price': float(result['conditions']['price']),
+                    'rsi': float(result['conditions']['rsi']),
+                    'rsi_condition': bool(result['conditions']['rsi_condition']),
+                    'macd_histogram': float(result['conditions']['macd_histogram']),
+                    'prev_macd_histogram': float(result['conditions']['prev_macd_histogram']),
+                    'macd_condition': bool(result['conditions']['macd_condition'])
+                }
+            }
+            results.append(serializable_result)
+            
+        return results
+
+    def check_open_positions(self):
+        """Check only existing positions for exit conditions without scanning for new entries"""
+        # Just run the exit conditions check
+        self._check_exit_conditions()

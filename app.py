@@ -26,12 +26,26 @@ bot_running = False
 
 def bot_loop():
     global bot_running
+    last_scan_time = 0
+    
     while bot_running:
         try:
-            bot.scan_market()
-            time.sleep(30)  # Check every 30 seconds
+            current_time = time.time()
+            
+            # Always check open positions (every second)
+            bot.check_open_positions()
+            
+            # Scan market for new entries every 10 seconds
+            if current_time - last_scan_time >= 10:
+                bot.scan_market()
+                last_scan_time = current_time
+                
+            # Sleep for 1 second
+            time.sleep(1)
+            
         except Exception as e:
             print(f"Error in bot loop: {e}")
+    
     print("Bot stopped")
 
 @app.route('/')
@@ -113,5 +127,9 @@ def stats():
 def history():
     return jsonify(bot.get_trade_history())
 
+@app.route('/entry-conditions')
+def entry_conditions():
+    return jsonify(bot.get_entry_conditions())
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)

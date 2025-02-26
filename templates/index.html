@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tradox - Crypto Trading Bot</title>
+    <!-- Bulma CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Dark Theme */
+        :root {
+            --bg-dark: #0a0e17;
+            --bg-dark-secondary: #141d2b;
+            --bg-card: #1a2332;
+            --text-light: #e4e7ec;
+            --text-muted: #8295b0;
+            --accent: #5367fe;
+            --success: #00c853;
+            --danger: #ff3860;
+            --warning: #ffdd57;
+            --info: #209cee;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            min-height: 100vh;
+        }
+        
+        .card {
+            background-color: var(--bg-card);
+            color: var(--text-light);
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
+        }
+        
+        .card-header {
+            background-color: var(--bg-dark-secondary);
+            border-bottom: 1px solid #2a3543;
+            padding: 1rem;
+        }
+        
+        .card-header-title {
+            color: var(--text-light);
+            font-weight: 600;
+        }
+        
+        .table {
+            background-color: var(--bg-card);
+            color: var(--text-light);
+        }
+        
+        .table th {
+            color: var(--text-muted);
+            border-color: #2a3543;
+        }
+        
+        .table td {
+            border-color: #2a3543;
+        }
+        
+        .table.is-striped tbody tr:not(.is-selected):nth-child(even) {
+            background-color: var(--bg-dark-secondary);
+        }
+        
+        .input, .textarea, .select select {
+            background-color: var(--bg-dark-secondary);
+            border-color: #2a3543;
+            color: var (--text-light);
+        }
+        
+        .input:focus, .textarea:focus, .select select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 0.125em rgba(83, 103, 254, 0.25);
+        }
+        
+        .button {
+            border: none;
+            font-weight: 500;
+        }
+        
+        .button.is-primary {
+            background-color: var(--accent);
+        }
+        
+        .button.is-primary:hover {
+            background-color: #4a5ce2;
+        }
+        
+        .button.is-danger {
+            background-color: var(--danger);
+        }
+        
+        .button.is-success {
+            background-color: var (--success);
+        }
+        
+        .button.is-warning {
+            background-color: var(--warning);
+            color: #363636;
+        }
+        
+        .notification {
+            background-color: var(--bg-dark-secondary);
+            color: var(--text-light);
+        }
+        
+        .notification.is-info {
+            background-color: var(--info);
+        }
+        
+        .tag.is-success {
+            background-color: var(--success);
+        }
+        
+        .tag.is-danger {
+            background-color: var(--danger);
+        }
+        
+        .tag.is-info {
+            background-color: var(--info);
+        }
+        
+        .tag.is-warning {
+            background-color: var(--warning);
+            color: #363636;
+        }
+        
+        .profit {
+            color: var(--success);
+        }
+        
+        .loss {
+            color: var(--danger);
+        }
+        
+        .position-box {
+            padding: 1rem;
+            border-bottom: 1px solid #2a3543;
+        }
+        
+        .position-box:last-child {
+            border-bottom: none;
+        }
+        
+        .simulation-tag {
+            background-color: var(--info);
+            color: white;
+        }
+        
+        .live-tag {
+            background-color: var(--danger);
+            color: white;
+        }
+        
+        .trade-history {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        /* Custom scrollbar for Webkit browsers */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--bg-dark-secondary);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #3e4c65;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4e5d78;
+        }
+    </style>
+</head>
+<body>
+    <section class="section">
+        <div class="container">
+            <h1 class="title has-text-centered has-text-light mb-6">
+                Tradox - Binance Crypto Trading Bot
+                {% if simulation_mode %}
+                <span class="tag is-medium simulation-tag ml-2">SIMULATION</span>
+                {% else %}
+                <span class="tag is-medium live-tag ml-2">LIVE TRADING</span>
+                {% endif %}
+            </h1>
+            
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="notification is-info is-light">
+                            <button class="delete"></button>
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            
+            <div class="card mb-5">
+                <header class="card-header">
+                    <p class="card-header-title">
+                        <i class="fas fa-robot mr-2"></i> Bot Control
+                    </p>
+                </header>
+                <div class="card-content">
+                    <div class="columns">
+                        <div class="column is-half">
+                            <form action="/start" method="post">
+                                <div class="field">
+                                    <label class="label has-text-light">Coins to Trade (comma separated)</label>
+                                    <div class="control">
+                                        <input class="input" type="text" id="coins" name="coins" placeholder="BTC,ETH,SOL,DOGE" required>
+                                    </div>
+                                    <p class="help has-text-light">Enter the coin symbols without USDT (e.g., BTC, ETH)</p>
+                                </div>
+                                <div class="field">
+                                    <div class="control">
+                                        <button type="submit" class="button is-success is-fullwidth" {% if bot_status %}disabled{% endif %}>
+                                            <i class="fas fa-play mr-2"></i> Start Bot
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="column is-half">
+                            <div class="box" style="background-color: var(--bg-dark-secondary); color: var(--text-light);">
+                                <h5 class="title is-5 has-text-light">Bot Status</h5>
+                                <div class="level">
+                                    <div class="level-left">
+                                        <p>Status: 
+                                            <span id="bot-status" class="tag {% if bot_status %}is-success{% else %}is-danger{% endif %}">
+                                                {% if bot_status %}Running{% else %}Stopped{% endif %}
+                                            </span>
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                                <div class="buttons">
+                                    <form action="/stop" method="post" class="mr-2">
+                                        <button type="submit" class="button is-danger" {% if not bot_status %}disabled{% endif %}>
+                                            <i class="fas fa-stop mr-2"></i> Stop Bot
+                                        </button>
+                                    </form>
+                                    
+                                    <form action="/toggle-mode" method="post">
+                                        <button type="submit" class="button is-warning" {% if bot_status %}disabled{% endif %}>
+                                            <i class="fas fa-sync-alt mr-2"></i>
+                                            {% if simulation_mode %}Switch to LIVE Mode{% else %}Switch to SIMULATION Mode{% endif %}
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="columns">
+                <div class="column is-half">
+                    <div class="card mb-5">
+                        <header class="card-header">
+                            <p class="card-header-title">
+                                <i class="fas fa-chart-line mr-2"></i> Open Positions (Max: 2)
+                            </p>
+                        </header>
+                        <div class="card-content">
+                            <div id="positions-container">
+                                {% if positions %}
+                                    {% for position in positions %}
+                                        <div class="position-box">
+                                            <h4 class="title is-4 has-text-light">{{ position.symbol }}</h4>
+                                            <div class="columns is-mobile">
+                                                <div class="column">
+                                                    <p><strong>Entry:</strong> {{ position.entry_price }}</p>
+                                                    <p><strong>Current:</strong> {{ position.current_price }}</p>
+                                                </div>
+                                                <div class="column">
+                                                    <p><strong>Quantity:</strong> {{ position.quantity }}</p>
+                                                    <p>
+                                                        <strong>Profit:</strong> 
+                                                        <span class="{% if position.profit_pct >= 0 %}profit{% else %}loss{% endif %}">
+                                                            {{ "%.2f"|format(position.profit_pct) }}%
+                                                        </span>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <p><strong>Entry Time:</strong> {{ position.entry_time }}</p>
+                                        </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <div class="has-text-centered p-5">
+                                        <i class="fas fa-search fa-3x has-text-grey-lighter mb-3"></i>
+                                        <p class="has-text-grey-light">No open positions</p>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mb-5">
+                        <header class="card-header">
+                            <p class="card-header-title">
+                                <i class="fas fa-chart-bar mr-2"></i> Performance Statistics
+                            </p>
+                        </header>
+                        <div class="card-content">
+                            <div id="stats-container">
+                                <table class="table is-fullwidth">
+                                    <tbody>
+                                        <tr>
+                                            <th>Total Trades</th>
+                                            <td>{{ stats.total_trades }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Winning Trades</th>
+                                            <td>{{ stats.winning_trades }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Losing Trades</th>
+                                            <td>{{ stats.losing_trades }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Win Rate</th>
+                                            <td>{{ "%.2f"|format(stats.win_rate) }}%</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Total Profit</th>
+                                            <td class="{% if stats.total_profit_pct >= 0 %}profit{% else %}loss{% endif %}">
+                                                {{ "%.2f"|format(stats.total_profit_pct) }}%
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Avg. Profit/Trade</th>
+                                            <td class="{% if stats.average_profit_per_trade >= 0 %}profit{% else %}loss{% endif %}">
+                                                {{ "%.2f"|format(stats.average_profit_per_trade) }}%
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="column is-half">
+                    <div class="card mb-5">
+                        <header class="card-header">
+                            <p class="card-header-title">
+                                <i class="fas fa-history mr-2"></i> Trade History
+                            </p>
+                        </header>
+                        <div class="card-content p-0 trade-history">
+                            <div id="history-container">
+                                <table class="table is-fullwidth is-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Symbol</th>
+                                            <th>Entry</th>
+                                            <th>Exit</th>
+                                            <th>Profit</th>
+                                            <th>Time</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="history-tbody">
+                                        <!-- Will be populated via AJAX -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        // Close notification on delete button click
+        document.addEventListener('DOMContentLoaded', () => {
+            (document.querySelectorAll('.notification .delete') || []).forEach(($delete) => {
+                const $notification = $delete.parentNode;
+                $delete.addEventListener('click', () => {
+                    $notification.parentNode.removeChild($notification);
+                });
+            });
+        });
+        
+        // Update positions and statistics
+        function updateData() {
+            // Update positions
+            $.get('/positions', function(data) {
+                let positionsHtml = '';
+                
+                if (data.length === 0) {
+                    positionsHtml = `
+                        <div class="has-text-centered p-5">
+                            <i class="fas fa-search fa-3x has-text-grey-lighter mb-3"></i>
+                            <p class="has-text-grey-light">No open positions</p>
+                        </div>
+                    `;
+                } else {
+                    data.forEach(function(position) {
+                        const profitClass = position.profit_pct >= 0 ? 'profit' : 'loss';
+                        positionsHtml += `
+                            <div class="position-box">
+                                <h4 class="title is-4 has-text-light">${position.symbol}</h4>
+                                <div class="columns is-mobile">
+                                    <div class="column">
+                                        <p><strong>Entry:</strong> ${position.entry_price}</p>
+                                        <p><strong>Current:</strong> ${position.current_price}</p>
+                                    </div>
+                                    <div class="column">
+                                        <p><strong>Quantity:</strong> ${position.quantity}</p>
+                                        <p>
+                                            <strong>Profit:</strong> 
+                                            <span class="${profitClass}">
+                                                ${position.profit_pct.toFixed(2)}%
+                                            </span>
+                                        </p>
+                                    </div>
+                                </div>
+                                <p><strong>Entry Time:</strong> ${position.entry_time}</p>
+                            </div>
+                        `;
+                    });
+                }
+                
+                $('#positions-container').html(positionsHtml);
+            });
+            
+            // Update statistics
+            $.get('/stats', function(data) {
+                const totalProfitClass = data.total_profit_pct >= 0 ? 'profit' : 'loss';
+                const avgProfitClass = data.average_profit_per_trade >= 0 ? 'profit' : 'loss';
+                
+                const statsHtml = `
+                    <table class="table is-fullwidth">
+                        <tbody>
+                            <tr>
+                                <th>Total Trades</th>
+                                <td>${data.total_trades}</td>
+                            </tr>
+                            <tr>
+                                <th>Winning Trades</th>
+                                <td>${data.winning_trades}</td>
+                            </tr>
+                            <tr>
+                                <th>Losing Trades</th>
+                                <td>${data.losing_trades}</td>
+                            </tr>
+                            <tr>
+                                <th>Win Rate</th>
+                                <td>${data.win_rate.toFixed(2)}%</td>
+                            </tr>
+                            <tr>
+                                <th>Total Profit</th>
+                                <td class="${totalProfitClass}">${data.total_profit_pct.toFixed(2)}%</td>
+                            </tr>
+                            <tr>
+                                <th>Avg. Profit/Trade</th>
+                                <td class="${avgProfitClass}">${data.average_profit_per_trade.toFixed(2)}%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                `;
+                
+                $('#stats-container').html(statsHtml);
+            });
+            
+            // Update trade history
+            $.get('/history', function(data) {
+                let historyHtml = '';
+                
+                if (data.length === 0) {
+                    historyHtml = `
+                        <tr>
+                            <td colspan="5" class="has-text-centered">No trade history</td>
+                        </tr>
+                    `;
+                } else {
+                    data.reverse().forEach(function(trade) {
+                        const profitClass = trade.profit_pct >= 0 ? 'profit' : 'loss';
+                        historyHtml += `
+                            <tr>
+                                <td>${trade.symbol}</td>
+                                <td>${trade.entry_price}</td>
+                                <td>${trade.exit_price}</td>
+                                <td class="${profitClass}">${trade.profit_pct.toFixed(2)}%</td>
+                                <td>${trade.exit_time}</td>
+                            </tr>
+                        `;
+                    });
+                }
+                
+                $('#history-tbody').html(historyHtml);
+            });
+        }
+        
+        // Update every 10 seconds if bot is running
+        const botStatus = JSON.parse('{{ bot_status|tojson|safe }}');
+        if (botStatus) {
+            setInterval(updateData, 10000);
+        }
+        
+        // Initial data load
+        $(document).ready(function() {
+            updateData();
+        });
+    </script>
+</body>
+</html>

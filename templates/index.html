@@ -3,822 +3,862 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tradox | Advanced Crypto Trading Bot</title>
+    <title>Tradox - Crypto Trading Bot</title>
     <!-- Bulma CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- ApexCharts -->
-    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-    <!-- Custom Fonts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Google Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        /* Modern Render-style Theme - Dark Mode Only */
         :root {
-            /* Main theme colors */
-            --color-background: #0b1622;
-            --color-surface: #121f2e;
-            --color-card: #172331;
-            --color-card-header: #1d2c3b;
-            --color-border: #23384d;
+            /* Dark theme colors */
+            --bg-main: #0f172a;
+            --bg-sidebar: #1e293b;
+            --bg-card: #1e293b;
+            --bg-code: #334155;
+            --bg-hover: #2d3748;
             
-            /* Text colors */
-            --color-text-primary: #e2e8f0;
-            --color-text-secondary: #94a3b8;
-            --color-text-muted: #64748b;
+            --color-text: #e2e8f0;
+            --color-text-muted: #94a3b8;
+            --color-heading: #f1f5f9;
             
-            /* Accent colors */
-            --color-primary: #3b82f6;
-            --color-primary-hover: #2563eb;
+            --color-primary: #4f46e5;
+            --color-primary-hover: #4338ca;
+            --color-primary-light: #3b358997;
+            
             --color-success: #10b981;
+            --color-success-light: #057a5520;
             --color-danger: #ef4444;
+            --color-danger-light: #dc262620;
             --color-warning: #f59e0b;
+            --color-warning-light: #d9770620;
             --color-info: #0ea5e9;
+            --color-info-light: #0284c720;
             
-            /* Chart colors */
-            --color-chart-profit: rgba(16, 185, 129, 0.2);
-            --color-chart-profit-line: rgba(16, 185, 129, 1);
-            --color-chart-loss: rgba(239, 68, 68, 0.2);
-            --color-chart-loss-line: rgba(239, 68, 68, 1);
+            --border-color: #334155;
+            --border-radius: 8px;
             
-            /* Shadows */
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            
-            /* Animations */
-            --transition-fast: 150ms ease;
-            --transition-normal: 300ms ease;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.25);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+            --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
         }
-        
-        /* Base styles */
-        html, body {
-            font-family: 'Montserrat', sans-serif;
-            background-color: var(--color-background);
-            color: var(--color-text-primary);
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--color-text);
             min-height: 100vh;
-            scroll-behavior: smooth;
+            display: flex;
         }
         
-        /* Typography */
-        .title, .subtitle, h1, h2, h3, h4, h5, h6 {
-            color: var(--color-text-primary);
-            font-family: 'Montserrat', sans-serif;
+        /* Sidebar styling */
+        .sidebar {
+            background-color: var(--bg-sidebar);
+            width: 240px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            overflow-y: auto;
+            border-right: 1px solid var(--border-color);
+            padding: 1.5rem 0;
         }
         
-        .monospace {
-            font-family: 'Roboto Mono', monospace;
+        .sidebar-header {
+            padding: 0 1.5rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 1.5rem;
         }
         
-        /* Layout Components */
-        .main-container {
+        .sidebar-logo {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--color-primary);
+            display: flex;
+            align-items: center;
+        }
+        
+        .sidebar-logo i {
+            margin-right: 0.75rem;
+        }
+        
+        .sidebar-nav {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .sidebar-nav-item {
+            margin-bottom: 0.25rem;
+        }
+        
+        .sidebar-nav-link {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            color: var(--color-text-muted);
+            text-decoration: none !important;
+            font-weight: 500;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+        
+        .sidebar-nav-link:hover {
+            background-color: var(--bg-hover);
+            color: var(--color-primary);
+        }
+        
+        .sidebar-nav-link.active {
+            background-color: var(--color-primary-light);
+            color: var(--color-primary);
+            border-left-color: var(--color-primary);
+        }
+        
+        .sidebar-nav-link i {
+            margin-right: 0.75rem;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .sidebar-footer {
             padding: 1.5rem;
-            max-width: 1440px;
-            margin: 0 auto;
+            border-top: 1px solid var(--border-color);
+            margin-top: auto;
         }
         
-        .navbar {
-            background-color: var(--color-card);
-            border-bottom: 1px solid var(--color-border);
+        .sidebar-status {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
         }
         
-        .navbar-item img {
-            max-height: 2rem;
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 0.75rem;
         }
         
-        .navbar-link, .navbar-item, .navbar-dropdown {
-            color: var(--color-text-primary);
-            background-color: var(--color-card);
+        .status-indicator.active {
+            background-color: var(--color-success);
+            box-shadow: 0 0 8px var(--color-success);
         }
         
-        .navbar-link:hover, .navbar-item:hover {
-            background-color: var(--color-card-header) !important;
-            color: var(--color-text-primary) !important;
+        .status-indicator.inactive {
+            background-color: var(--color-danger);
+        }
+        
+        /* Main content area */
+        .main-content {
+            flex: 1;
+            margin-left: 240px;
+            padding: 2rem;
+        }
+        
+        /* Header bar */
+        .header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--color-heading);
+        }
+        
+        .header-actions {
+            display: flex;
+            align-items: center;
+        }
+        
+        .time-display {
+            background-color: var(--bg-code);
+            padding: 0.5rem 0.75rem;
+            border-radius: var(--border-radius);
+            color: var(--color-text-muted);
+            font-size: 0.85rem;
+            margin-left: 1rem;
         }
         
         /* Cards */
         .card {
-            background-color: var(--color-card);
-            border-radius: 0.5rem;
-            box-shadow: var(--shadow-md);
-            border: 1px solid var(--color-border);
+            background-color: var(--bg-card);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border-color);
             overflow: hidden;
-            transition: transform var(--transition-fast), box-shadow var(--transition-fast);
-            height: 100%;
-        }
-        
-        .card:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
         }
         
         .card-header {
-            background-color: var(--color-card-header);
-            border-bottom: 1px solid var(--color-border);
-            padding: 1rem;
+            padding: 1.25rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--bg-card);
         }
         
-        .card-header-title {
-            color: var(--color-text-primary);
+        .card-title {
+            margin: 0;
             font-weight: 600;
+            font-size: 1rem;
+            color: var(--color-heading);
+            display: flex;
+            align-items: center;
+        }
+        
+        .card-title i {
+            margin-right: 0.5rem;
+            color: var(--color-text-muted);
         }
         
         .card-content {
             padding: 1.5rem;
         }
         
-        /* Tables */
-        .table {
-            background-color: transparent;
-            color: var(--color-text-primary);
+        /* Trading controls panel */
+        .controls-panel {
+            background-color: var(--color-primary-light);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
         }
         
-        .table th {
-            color: var(--color-text-secondary);
-            border-bottom-color: var(--color-border);
+        .controls-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
         }
         
-        .table td {
-            border-color: var(--color-border);
-            vertical-align: middle;
+        .coin-input {
+            background-color: var (--bg-card);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
         }
         
-        .table tr:hover {
-            background-color: var(--color-card-header);
+        .bot-controls {
+            background-color: var(--bg-card);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
         }
         
-        .table.is-hoverable tbody tr:not(.is-selected):hover {
-            background-color: var(--color-card-header);
+        .control-title {
+            font-weight: 600;
+            color: var(--color-heading);
+            margin-bottom: 1rem;
         }
         
-        /* Form elements */
-        .input, .textarea, .select select {
-            background-color: var(--color-surface);
-            border-color: var(--color-border);
-            color: var(--color-text-primary);
-            box-shadow: none;
+        /* Action buttons */
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
         }
         
-        .input:hover, .textarea:hover, .select select:hover {
-            border-color: var(--color-primary);
+        .btn {
+            padding: 0.75rem 1.25rem;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
         }
         
-        .input:focus, .textarea:focus, .select select:focus {
-            border-color: var(--color-primary);
-            box-shadow: 0 0 0 0.125em rgba(59, 130, 246, 0.25);
+        .btn i {
+            margin-right: 0.5rem;
         }
         
-        .input::placeholder, .textarea::placeholder {
-            color: var(--color-text-muted);
-        }
-        
-        /* Buttons */
-        .button {
-            border-radius: 0.375rem;
-            font-weight: 500;
-            transition: all var(--transition-fast);
-        }
-        
-        .button.is-primary {
+        .btn-primary {
             background-color: var(--color-primary);
+            color: white;
         }
         
-        .button.is-primary:hover {
+        .btn-primary:hover {
             background-color: var(--color-primary-hover);
         }
         
-        .button.is-success {
-            background-color: var(--color-success);
-        }
-        
-        .button.is-danger {
+        .btn-danger {
             background-color: var(--color-danger);
+            color: white;
         }
         
-        .button.is-warning {
+        .btn-danger:hover {
+            background-color: #dc2626;
+        }
+        
+        .btn-warning {
             background-color: var(--color-warning);
-            color: #fff;
+            color: white;
         }
         
-        .button.is-info {
-            background-color: var(--color-info);
+        .btn-warning:hover {
+            background-color: #d97706;
         }
         
-        .button.is-ghost {
+        .btn-outline {
+            border: 1px solid var(--border-color);
             background-color: transparent;
-            border-color: transparent;
-            color: var(--color-text-secondary);
-        }
-        
-        .button.is-ghost:hover {
-            color: var(--color-primary);
-            background-color: rgba(59, 130, 246, 0.1);
-        }
-        
-        /* Notifications & tags */
-        .notification {
-            background-color: var(--color-surface);
-            padding: 1rem 1.5rem;
-            border-radius: 0.5rem;
-            box-shadow: var(--shadow-md);
-        }
-        
-        .notification .delete {
-            background-color: var(--color-text-muted);
-        }
-        
-        .tag {
-            border-radius: 0.375rem;
-        }
-        
-        .tag.is-success {
-            background-color: var(--color-success);
-        }
-        
-        .tag.is-danger {
-            background-color: var(--color-danger);
-        }
-        
-        .tag.is-warning {
-            background-color: var(--color-warning);
-            color: #fff;
-        }
-        
-        .tag.is-info {
-            background-color: var(--color-info);
-        }
-        
-        /* Custom utility classes */
-        .profit {
-            color: var(--color-success) !important;
-        }
-        
-        .loss {
-            color: var(--color-danger) !important;
-        }
-        
-        .neutral {
-            color: var(--color-text-secondary) !important;
-        }
-        
-        .bg-profit {
-            background-color: rgba(16, 185, 129, 0.1) !important;
-        }
-        
-        .bg-loss {
-            background-color: rgba(239, 68, 68, 0.1) !important;
-        }
-        
-        .border-profit {
-            border-left: 3px solid var(--color-success) !important;
-        }
-        
-        .border-loss {
-            border-left: 3px solid var(--color-danger) !important;
-        }
-        
-        .rounded-md {
-            border-radius: 0.375rem;
-        }
-        
-        .shadow-md {
-            box-shadow: var(--shadow-md);
-        }
-        
-        /* Stat card */
-        .stat-card {
-            background-color: var(--color-card);
-            border-radius: 0.5rem;
-            padding: 1.5rem;
-            box-shadow: var(--shadow-md);
-            border: 1px solid var(--color-border);
-            position: relative;
-        }
-        
-        .stat-card .icon {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
             color: var(--color-text-muted);
-            opacity: 0.3;
         }
         
-        .stat-title {
-            font-size: 0.875rem;
-            color: var(--color-text-secondary);
-            margin-bottom: 0.5rem;
+        .btn-outline:hover {
+            background-color: var(--bg-hover);
+            color: var(--color-text);
         }
         
-        .stat-value {
-            font-size: 1.5rem;
+        /* Inputs */
+        .input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: var (--border-radius);
+            background-color: var(--bg-main);
+            color: var(--color-text);
+            transition: all 0.2s;
+        }
+        
+        .input:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+        
+        .input-help {
+            font-size: 0.8rem;
+            color: var(--color-text-muted);
+            margin-top: 0.5rem;
+        }
+        
+        /* Dashboard grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+        
+        /* Mode tags */
+        .mode-tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.8rem;
             font-weight: 600;
-            color: var(--color-text-primary);
+            border-radius: 100px;
+            margin-left: 0.75rem;
         }
         
-        /* Position card */
+        .mode-tag.simulation {
+            background-color: var(--color-info-light);
+            color: var(--color-info);
+        }
+        
+        .mode-tag.live {
+            background-color: var(--color-danger-light);
+            color: var(--color-danger);
+        }
+        
+        /* Tables */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .data-table th {
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--color-text-muted);
+            text-transform: uppercase;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .data-table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .data-table tr:hover td {
+            background-color: var(--bg-hover);
+        }
+        
+        /* Entry Signal Monitor */
+        .signal-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: -1rem; /* To offset the card padding */
+        }
+        
+        .signal-table th {
+            position: sticky;
+            top: 0;
+            background-color: var(--bg-card);
+            z-index: 10;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 500;
+            color: var(--color-text-muted);
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .signal-table td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .signal-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .signal-table .symbol-cell {
+            font-weight: 500;
+            color: var (--color-heading);
+        }
+        
+        .signal-row:hover td {
+            background-color: var(--bg-hover);
+        }
+        
+        .signal-row.signal-buy td {
+            background-color: var(--color-success-light);
+        }
+        
+        .signal-row.signal-buy:hover td {
+            background-color: #d1fae5;
+        }
+        
+        /* Tags */
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border-radius: 4px;
+        }
+        
+        .tag-success {
+            background-color: var(--color-success-light);
+            color: var(--color-success);
+        }
+        
+        .tag-neutral {
+            background-color: var(--bg-code);
+            color: var(--color-text-muted);
+        }
+        
+        /* Positions */
         .position-card {
-            background-color: var(--color-card-header);
-            border-radius: 0.5rem;
-            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--bg-card);
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border-color);
             margin-bottom: 1rem;
-            border: 1px solid var(--color-border);
-            transition: transform var(--transition-fast);
-        }
-        
-        .position-card:hover {
-            transform: translateY(-2px);
-        }
-        
-        .position-card:last-child {
-            margin-bottom: 0;
+            overflow: hidden;
         }
         
         .position-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 0.75rem;
+            padding: 1rem;
+            background-color: var(--bg-code);
         }
         
         .position-symbol {
             font-weight: 600;
-            font-size: 1.25rem;
+            font-size: 1.1rem;
+            color: var(--color-heading);
         }
         
-        /* Chart container */
-        .chart-container {
-            height: 250px;
-            width: 100%;
+        .position-time {
+            font-size: 0.85rem;
+            color: var(--color-text-muted);
         }
         
-        /* Coin list item */
-        .coin-item {
+        .position-body {
+            padding: 1rem;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+        
+        .position-data {
             display: flex;
-            align-items: center;
-            padding: 0.75rem 1rem;
-            border-bottom: 1px solid var(--color-border);
-            transition: background-color var(--transition-fast);
+            flex-direction: column;
         }
         
-        .coin-item:hover {
-            background-color: var(--color-card-header);
-        }
-        
-        .coin-item:last-child {
-            border-bottom: none;
-        }
-        
-        .coin-icon {
-            width: 2rem;
-            height: 2rem;
-            background-color: var(--color-surface);
-            border-radius: 9999px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 0.75rem;
+        .position-label {
+            font-size: 0.85rem;
             font-weight: 500;
-            font-size: 0.8rem;
-        }
-        
-        .coin-info {
-            flex: 1;
-        }
-        
-        .coin-symbol {
-            font-weight: 600;
-            font-size: 0.9rem;
-            color: var (--color-text-primary);
-        }
-        
-        .coin-metrics {
-            display: flex;
-            align-items: center;
-        }
-        
-        .coin-metric {
-            margin-right: 1rem;
-        }
-        
-        .coin-metric-label {
-            font-size: 0.7rem;
             color: var(--color-text-muted);
             margin-bottom: 0.25rem;
         }
         
-        .coin-metric-value {
-            font-family: 'Roboto Mono', monospace;
-            font-size: 0.85rem;
+        .position-value {
+            font-weight: 600;
+            color: var(--color-heading);
         }
         
-        .coin-signal {
-            padding: 0.35rem 0.75rem;
-            border-radius: 0.375rem;
-            font-weight: 500;
-            font-size: 0.75rem;
-            min-width: 4rem;
+        .profit {
+            color: var(--color-success);
+            font-weight: 700;
+        }
+        
+        .loss {
+            color: var(--color-danger);
+            font-weight: 700;
+        }
+        
+        .scrollable-area {
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 0 1px; /* Prevents shadow cutoff */
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--bg-main);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        
+        /* Notifications */
+        .notification {
+            background-color: var(--bg-card);
+            border-left: 4px solid var(--color-info);
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            position: relative;
+        }
+        
+        .notification.is-info {
+            background-color: var(--color-info-light);
+        }
+        
+        .notification .delete {
+            position: absolute;
+            right: 1rem;
+            top: 1rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--color-text-muted);
+        }
+        
+        .notification .delete:hover {
+            color: var(--color-text);
+        }
+        
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem;
             text-align: center;
         }
         
-        .signal-buy {
-            background-color: rgba(16, 185, 129, 0.15);
-            color: var(--color-success);
-            border: 1px solid rgba(16, 185, 129, 0.3);
+        .empty-state i {
+            font-size: 2.5rem;
+            color: var(--color-text-muted);
+            margin-bottom: 1rem;
         }
         
-        .signal-none {
-            background-color: rgba(100, 116, 139, 0.15);
-            color: var(--color-text-secondary);
-            border: 1px solid rgba(100, 116, 139, 0.3);
+        .empty-state-text {
+            color: var(--color-text-muted);
         }
         
-        /* Animation for value changes */
+        /* Loading spinner */
+        .loading-spinner {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem;
+            opacity: 0.7;
+        }
+        
+        /* Flashing animation */
         .flash-change {
             animation: flash-animation 1s ease-out;
         }
         
         @keyframes flash-animation {
-            0% { background-color: rgba(59, 130, 246, 0.2); }
+            0% { background-color: rgba(79, 70, 229, 0.2); }
             100% { background-color: transparent; }
         }
         
-        /* Status indicators */
-        .status-indicator {
-            width: 8px;
-            height: 8px;
-            border-radius: 9999px;
-            display: inline-block;
-            margin-right: 0.5rem;
-        }
-        
-        .status-indicator.active {
-            background-color: var(--color-success);
-            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.3);
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
-            70% { box-shadow: 0 0 0 5px rgba(16, 185, 129, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
-        }
-        
-        .status-indicator.inactive {
-            background-color: var(--color-danger);
-            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.3);
-        }
-        
-        /* Trade history */
-        .trade-history {
-            max-height: 50vh;
-            overflow-y: auto;
-        }
-        
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: var(--color-surface);
-            border-radius: 4px;
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: var(--color-text-muted);
-            border-radius: 4px;
-        }
-        
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--color-text-secondary);
-        }
-        
-        /* Loading State */
-        .loading {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(11, 22, 34, 0.7);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 10;
-            border-radius: 0.5rem;
-            backdrop-filter: blur(2px);
-        }
-        
-        .loader {
-            width: 2.5rem;
-            height: 2.5rem;
-            border: 3px solid var(--color-text-muted);
-            border-bottom-color: var(--color-primary);
+        /* Refresh button */
+        .refresh-button {
+            background: none;
+            border: none;
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
-            display: inline-block;
-            box-sizing: border-box;
-            animation: rotation 1s linear infinite;
-        }
-        
-        @keyframes rotation {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        /* Navbar */
-        .logo {
-            font-weight: 700;
-            font-size: 1.5rem;
-            letter-spacing: -0.5px;
-        }
-        
-        .logo-accent {
-            color: var(--color-primary);
-        }
-        
-        /* Layout adjustments */
-        .is-relative {
-            position: relative;
-        }
-        
-        .navbar-item img {
-            max-height: 2.5rem;
-        }
-        
-        /* Mode toggle */
-        .mode-badge {
-            border-radius: 0.5rem;
-            padding: 0.5rem 0.75rem;
-            font-weight: 500;
-            font-size: 0.75rem;
-            display: inline-flex;
+            color: var(--color-text-muted);
+            cursor: pointer;
+            display: flex;
             align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
         }
         
-        .mode-badge.simulation {
-            background-color: rgba(14, 165, 233, 0.15);
-            color: var(--color-info);
-            border: 1px solid rgba(14, 165, 233, 0.3);
-        }
-        
-        .mode-badge.live {
-            background-color: rgba(239, 68, 68, 0.15);
-            color: var(--color-danger);
-            border: 1px solid rgba(239, 68, 68, 0.3);
+        .refresh-button:hover {
+            background-color: var(--bg-hover);
+            color: var(--color-heading);
         }
     </style>
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar is-fixed-top shadow-md" role="navigation" aria-label="main navigation">
-        <div class="container">
-            <div class="navbar-brand">
-                <a class="navbar-item" href="/">
-                    <span class="logo">TRAD<span class="logo-accent">OX</span></span>
-                </a>
-
-                <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarMenu">
-                    <span aria-hidden="true"></span>
-                    <span aria-hidden="true"></span>
-                    <span aria-hidden="true"></span>
-                </a>
+    <!-- Sidebar navigation -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <i class="fas fa-chart-line"></i>
+                <span>Tradox</span>
             </div>
+        </div>
+        
+        <ul class="sidebar-nav">
+            <li class="sidebar-nav-item">
+                <a href="#" class="sidebar-nav-link active">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="#" class="sidebar-nav-link">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Positions</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="#" class="sidebar-nav-link">
+                    <i class="fas fa-history"></i>
+                    <span>Trade History</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="#" class="sidebar-nav-link">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </a>
+            </li>
+        </ul>
+        
+        <div class="sidebar-footer" style="margin-top: auto;">
+            <div class="sidebar-status">
+                <div class="status-indicator {% if bot_status %}active{% else %}inactive{% endif %}"></div>
+                <span>Bot Status: <strong>{% if bot_status %}Running{% else %}Stopped{% endif %}</strong></span>
+            </div>
+            
+            <div style="margin-top: 1rem;">
+                <span class="mode-tag {% if simulation_mode %}simulation{% else %}live{% endif %}">
+                    <i class="fas {% if simulation_mode %}fa-vial{% else %}fa-broadcast-tower{% endif %} mr-1"></i>
+                    {% if simulation_mode %}Simulation{% else %}LIVE{% endif %}
+                </span>
+            </div>
+        </div>
+    </div>
 
-            <div id="navbarMenu" class="navbar-menu">
-                <div class="navbar-start">
-                    <a class="navbar-item">
-                        <i class="fas fa-chart-line mr-2"></i> Dashboard
-                    </a>
-                    
-                    <a class="navbar-item">
-                        <i class="fas fa-cog mr-2"></i> Settings
-                    </a>
-                </div>
-
-                <div class="navbar-end">
-                    <div class="navbar-item">
-                        <div class="mr-4">
-                            <span class="status-indicator {% if bot_status %}active{% else %}inactive{% endif %}"></span>
-                            <span>{% if bot_status %}Bot Running{% else %}Bot Stopped{% endif %}</span>
-                        </div>
-                    </div>
-                    
-                    <div class="navbar-item">
-                        <div class="mode-badge {% if simulation_mode %}simulation{% else %}live{% endif %} mr-2">
-                            <i class="fas {% if simulation_mode %}fa-flask{% else %}fa-bolt{% endif %} mr-1"></i>
-                            {% if simulation_mode %}SIMULATION{% else %}LIVE TRADING{% endif %}
-                        </div>
-                        <div id="current-time" class="has-text-grey ml-2 monospace"></div>
-                    </div>
+    <!-- Main content area -->
+    <div class="main-content">
+        <div class="header-bar">
+            <h1 class="page-title">Trading Dashboard</h1>
+            <div class="header-actions">
+                <div class="time-display" id="current-time">
+                    <i class="far fa-clock mr-1"></i>
+                    Loading...
                 </div>
             </div>
         </div>
-    </nav>
-    
-    <!-- Main Container -->
-    <div class="main-container" style="margin-top: 5rem;">
+
+        <!-- Notifications -->
         {% with messages = get_flashed_messages() %}
             {% if messages %}
                 {% for message in messages %}
-                    <div class="notification is-info mb-5">
-                        <button class="delete"></button>
+                    <div class="notification is-info">
+                        <button class="delete">&times;</button>
                         {{ message }}
                     </div>
                 {% endfor %}
             {% endif %}
         {% endwith %}
-        
-        <!-- Stats Summary -->
-        <div class="columns mb-5">
-            <div class="column is-3">
-                <div class="stat-card">
-                    <div class="icon">
-                        <i class="fas fa-coins fa-2x"></i>
-                    </div>
-                    <div class="stat-title">Total Profit</div>
-                    <div id="total-profit" class="stat-value"></div>
+
+        <!-- Trading controls -->
+        <div class="controls-panel">
+            <div class="controls-grid">
+                <div class="coin-input">
+                    <div class="control-title">Configure Trading Pairs</div>
+                    <form action="/start" method="post">
+                        <label for="coins">Trading Pairs</label>
+                        <input type="text" class="input" id="coins" name="coins" placeholder="BTC,ETH,SOL,DOGE" required>
+                        <p class="input-help">Enter coin symbols separated by commas (without USDT)</p>
+                        
+                        <button type="submit" class="btn btn-primary" style="margin-top: 1rem;" {% if bot_status %}disabled{% endif %}>
+                            <i class="fas fa-play"></i> Start Trading
+                        </button>
+                    </form>
                 </div>
-            </div>
-            
-            <div class="column is-3">
-                <div class="stat-card">
-                    <div class="icon">
-                        <i class="fas fa-exchange-alt fa-2x"></i>
+
+                <div class="bot-controls">
+                    <div class="control-title">Bot Controls</div>
+                    <p style="color: var(--color-text-muted); margin-bottom: 1rem;">
+                        Control the trading bot operation and mode.
+                    </p>
+                    
+                    <div class="action-buttons">
+                        <form action="/stop" method="post">
+                            <button type="submit" class="btn btn-danger" {% if not bot_status %}disabled{% endif %}>
+                                <i class="fas fa-stop"></i> Stop Bot
+                            </button>
+                        </form>
+                        
+                        <form action="/toggle-mode" method="post">
+                            <button type="submit" class="btn btn-warning" {% if bot_status %}disabled{% endif %}>
+                                <i class="fas fa-sync-alt"></i>
+                                {% if simulation_mode %}Switch to LIVE Mode{% else %}Switch to SIMULATION Mode{% endif %}
+                            </button>
+                        </form>
                     </div>
-                    <div class="stat-title">Total Trades</div>
-                    <div id="total-trades" class="stat-value"></div>
-                </div>
-            </div>
-            
-            <div class="column is-3">
-                <div class="stat-card">
-                    <div class="icon">
-                        <i class="fas fa-chart-pie fa-2x"></i>
-                    </div>
-                    <div class="stat-title">Win Rate</div>
-                    <div id="win-rate" class="stat-value"></div>
-                </div>
-            </div>
-            
-            <div class="column is-3">
-                <div class="stat-card">
-                    <div class="icon">
-                        <i class="fas fa-wallet fa-2x"></i>
-                    </div>
-                    <div class="stat-title">Open Positions</div>
-                    <div id="open-positions-count" class="stat-value"></div>
                 </div>
             </div>
         </div>
-        
-        <div class="columns">
+
+        <div class="dashboard-grid">
             <!-- Left Column -->
-            <div class="column is-8">
-                <!-- Performance Chart -->
-                <div class="card mb-5">
-                    <header class="card-header">
-                        <p class="card-header-title">
-                            <i class="fas fa-chart-area mr-2"></i> Performance History
-                        </p>
-                        <button class="button is-ghost card-header-icon" id="refresh-chart">
+            <div>
+                <!-- Open Positions Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">
+                            <i class="fas fa-chart-line"></i>
+                            Open Positions (Max: 2)
+                        </h2>
+                        <button class="refresh-button" onclick="updatePositions()">
                             <i class="fas fa-sync-alt"></i>
                         </button>
-                    </header>
-                    <div class="card-content">
-                        <div id="performance-chart" class="chart-container"></div>
                     </div>
-                </div>
-                
-                <!-- Open Positions and Bot Control -->
-                <div class="columns">
-                    <!-- Open Positions -->
-                    <div class="column is-7">
-                        <div class="card">
-                            <header class="card-header">
-                                <p class="card-header-title">
-                                    <i class="fas fa-wallet mr-2"></i> Open Positions
-                                </p>
-                                <button class="button is-ghost card-header-icon" onclick="updatePositions()">
-                                    <i class="fas fa-sync-alt"></i>
-                                </button>
-                            </header>
-                            <div class="card-content">
-                                <div id="positions-container" class="is-relative">
-                                    <!-- Will be populated via JavaScript -->
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Bot Controls -->
-                    <div class="column is-5">
-                        <div class="card">
-                            <header class="card-header">
-                                <p class="card-header-title">
-                                    <i class="fas fa-robot mr-2"></i> Bot Controls
-                                </p>
-                            </header>
-                            <div class="card-content">
-                                <form action="/start" method="post">
-                                    <div class="field">
-                                        <label class="label has-text-light">Coins to Trade</label>
-                                        <div class="control">
-                                            <input class="input" type="text" id="coins" name="coins" placeholder="BTC,ETH,SOL,DOGE" required>
-                                        </div>
-                                        <p class="help has-text-grey-light">Enter comma-separated symbols (e.g., BTC, ETH)</p>
-                                    </div>
-                                    
-                                    <div class="buttons mt-5">
-                                        <button type="submit" class="button is-primary" {% if bot_status %}disabled{% endif %}>
-                                            <i class="fas fa-play mr-2"></i> Start Bot
-                                        </button>
-                                        
-                                        <form action="/stop" method="post" class="is-inline">
-                                            <button type="submit" class="button is-danger" {% if not bot_status %}disabled{% endif %}>
-                                                <i class="fas fa-stop mr-2"></i> Stop Bot
-                                            </button>
-                                        </form>
-                                        
-                                        <form action="/toggle-mode" method="post" class="is-inline">
-                                            <button type="submit" class="button is-warning" {% if bot_status %}disabled{% endif %}>
-                                                <i class="fas fa-sync-alt mr-2"></i>
-                                                {% if simulation_mode %}Go LIVE{% else %}Switch to SIM{% endif %}
-                                            </button>
-                                        </form>
-                                    </div>
-                                </form>
-                            </div>
+                    <div class="card-content" id="positions-container">
+                        <div class="loading-spinner">
+                            <i class="fas fa-spinner fa-pulse fa-2x"></i>
+                            <p>Loading positions...</p>
                         </div>
                     </div>
                 </div>
-                
-                <!-- Trade History -->
-                <div class="card mt-5">
-                    <header class="card-header">
-                        <p class="card-header-title">
-                            <i class="fas fa-history mr-2"></i> Trade History
-                        </p>
-                        <button class="button is-ghost card-header-icon" onclick="updateHistory()">
+
+                <!-- Performance Stats Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">
+                            <i class="fas fa-chart-bar"></i>
+                            Performance Statistics
+                        </h2>
+                        <button class="refresh-button" onclick="updateStats()">
                             <i class="fas fa-sync-alt"></i>
                         </button>
-                    </header>
-                    <div class="card-content">
-                        <div class="trade-history is-relative">
-                            <table class="table is-fullwidth is-hoverable">
-                                <thead>
-                                    <tr>
-                                        <th>Symbol</th>
-                                        <th>Entry Price</th>
-                                        <th>Exit Price</th>
-                                        <th>Quantity</th>
-                                        <th>Profit</th>
-                                        <th>Time</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="history-tbody">
-                                    <!-- Will be populated via JavaScript -->
-                                </tbody>
-                            </table>
+                    </div>
+                    <div class="card-content" id="stats-container">
+                        <div class="loading-spinner">
+                            <i class="fas fa-spinner fa-pulse fa-2x"></i>
+                            <p>Loading statistics...</p>
                         </div>
                     </div>
                 </div>
             </div>
             
             <!-- Right Column -->
-            <div class="column is-4">
-                <!-- Market Signal Monitor -->
+            <div>
+                <!-- Entry Signals Card -->
                 <div class="card">
-                    <header class="card-header">
-                        <p class="card-header-title">
-                            <i class="fas fa-search mr-2"></i> Market Signal Monitor
-                        </p>
-                        <button class="button is-ghost card-header-icon" onclick="updateEntryConditions()">
+                    <div class="card-header">
+                        <h2 class="card-title">
+                            <i class="fas fa-search"></i>
+                            Entry Signal Monitor
+                        </h2>
+                        <button class="refresh-button" onclick="updateEntryConditions()">
                             <i class="fas fa-sync-alt"></i>
                         </button>
-                    </header>
-                    <div class="card-content is-relative p-0">
-                        <div id="conditions-container" class="coin-list">
-                            <!-- Will be populated via JavaScript -->
+                    </div>
+                    <div class="card-content" style="padding: 0;">
+                        <div class="scrollable-area" id="conditions-container">
+                            <div class="loading-spinner">
+                                <i class="fas fa-spinner fa-pulse fa-2x"></i>
+                                <p>Loading signals...</p>
+                            </div>
                         </div>
                     </div>
                 </div>
-                
-                <!-- Performance Statistics -->
-                <div class="card mt-5">
-                    <header class="card-header">
-                        <p class="card-header-title">
-                            <i class="fas fa-chart-bar mr-2"></i> Performance Statistics
-                        </p>
-                        <button class="button is-ghost card-header-icon" onclick="updateStats()">
+
+                <!-- Trade History Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">
+                            <i class="fas fa-history"></i>
+                            Trade History
+                        </h2>
+                        <button class="refresh-button" onclick="updateHistory()">
                             <i class="fas fa-sync-alt"></i>
                         </button>
-                    </header>
-                    <div class="card-content is-relative">
-                        <div id="stats-container">
-                            <!-- Will be populated via JavaScript -->
+                    </div>
+                    <div class="card-content" style="padding: 0;">
+                        <div class="scrollable-area">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Symbol</th>
+                                        <th>Entry</th>
+                                        <th>Exit</th>
+                                        <th>Profit</th>
+                                        <th>Time</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="history-tbody">
+                                    <tr>
+                                        <td colspan="5" class="text-center">
+                                            <div class="loading-spinner" style="padding: 1.5rem;">
+                                                <i class="fas fa-spinner fa-pulse"></i>
+                                                <p>Loading history...</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -830,195 +870,27 @@
     <script>
         // Global object to store the latest entry conditions by symbol
         const latestConditions = {};
-        let performanceChart = null;
-        let lastTradeCount = 0;
-        
-        // Properly parse the bot status from the Jinja template
-        const botStatus = JSON.parse('{{ bot_status|tojson|safe }}');
         
         // Format current time
         function updateCurrentTime() {
             const now = new Date();
             const options = { 
+                weekday: 'short', 
+                year: 'numeric', 
                 month: 'short', 
                 day: 'numeric', 
                 hour: '2-digit', 
-                minute: '2-digit', 
+                minute: '2-digit',
                 second: '2-digit'
             };
-            $('#current-time').text(now.toLocaleString('en-US', options));
+            $('#current-time').html('<i class="far fa-clock mr-1"></i> ' + now.toLocaleString('en-US', options));
         }
         
-        // Initialize ApexCharts
-        function initPerformanceChart(data) {
-            // If no trades, show empty chart
-            let series = [{
-                name: 'Profit',
-                data: []
-            }];
-            
-            let categories = [];
-            let profitData = [];
-            let cumulativeProfit = 0;
-            
-            if (data && data.length > 0) {
-                // Process trade data
-                data.forEach((trade, index) => {
-                    categories.push(`Trade ${index + 1}`);
-                    cumulativeProfit += trade.profit_pct;
-                    profitData.push(parseFloat(cumulativeProfit.toFixed(2)));
-                });
-                
-                series = [{
-                    name: 'Cumulative Profit (%)',
-                    data: profitData
-                }];
-            } else {
-                // Default empty chart
-                categories = ['No trades yet'];
-                profitData = [0];
-            }
-            
-            const options = {
-                chart: {
-                    type: 'area',
-                    height: 250,
-                    fontFamily: 'Montserrat, sans-serif',
-                    toolbar: {
-                        show: false
-                    },
-                    zoom: {
-                        enabled: false
-                    },
-                    background: 'transparent',
-                    foreColor: '#94a3b8'
-                },
-                series: series,
-                colors: [profitData[profitData.length - 1] >= 0 ? '#10b981' : '#ef4444'],
-                fill: {
-                    type: 'gradient',
-                    gradient: {
-                        shadeIntensity: 1,
-                        opacityFrom: 0.7,
-                        opacityTo: 0.2,
-                        stops: [0, 100],
-                        colorStops: [
-                            {
-                                offset: 0,
-                                color: profitData[profitData.length - 1] >= 0 ? 'rgba(16, 185, 129, 0.8)' : 'rgba(239, 68, 68, 0.8)',
-                                opacity: 0.8
-                            },
-                            {
-                                offset: 100,
-                                color: profitData[profitData.length - 1] >= 0 ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)',
-                                opacity: 0.2
-                            }
-                        ]
-                    }
-                },
-                stroke: {
-                    curve: 'smooth',
-                    width: 2
-                },
-                grid: {
-                    borderColor: '#23384d',
-                    strokeDashArray: 4,
-                    yaxis: {
-                        lines: {
-                            show: true
-                        }
-                    },
-                    padding: {
-                        top: 0,
-                        right: 0,
-                        bottom: 0,
-                        left: 0
-                    }
-                },
-                markers: {
-                    size: 4,
-                    colors: profitData[profitData.length - 1] >= 0 ? ['#10b981'] : ['#ef4444'],
-                    strokeColors: '#172331',
-                    strokeWidth: 2,
-                    hover: {
-                        size: 6
-                    }
-                },
-                xaxis: {
-                    categories: categories,
-                    axisBorder: {
-                        show: false
-                    },
-                    axisTicks: {
-                        show: false
-                    },
-                    labels: {
-                        show: true,
-                        style: {
-                            colors: '#64748b'
-                        }
-                    }
-                },
-                yaxis: {
-                    labels: {
-                        show: true,
-                        formatter: function (val) {
-                            return val.toFixed(2) + '%';
-                        },
-                        style: {
-                            colors: '#64748b'
-                        }
-                    }
-                },
-                tooltip: {
-                    theme: 'dark',
-                    x: {
-                        show: false
-                    },
-                    y: {
-                        formatter: function (val) {
-                            return val.toFixed(2) + '%';
-                        }
-                    },
-                    marker: {
-                        show: false
-                    },
-                    style: {
-                        fontSize: '12px',
-                        fontFamily: 'Montserrat, sans-serif'
-                    }
-                }
-            };
-            
-            performanceChart = new ApexCharts(document.querySelector("#performance-chart"), options);
-            performanceChart.render();
-        }
-        
-        // Mobile nav toggle
+        // Close notification on delete button click
         document.addEventListener('DOMContentLoaded', () => {
-            // Get navbar burger
-            const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
-            
-            // Add click event on each
-            if ($navbarBurgers.length > 0) {
-                $navbarBurgers.forEach(el => {
-                    el.addEventListener('click', () => {
-                        // Get target from data-target
-                        const target = el.dataset.target;
-                        const $target = document.getElementById(target);
-                        
-                        // Toggle the class on both elements
-                        el.classList.toggle('is-active');
-                        $target.classList.toggle('is-active');
-                    });
-                });
-            }
-            
-            // Close notification on delete button click
             (document.querySelectorAll('.notification .delete') || []).forEach(($delete) => {
-                const $notification = $delete.parentNode;
                 $delete.addEventListener('click', () => {
-                    $notification.parentNode.removeChild($notification);
+                    $delete.parentNode.remove();
                 });
             });
             
@@ -1030,51 +902,44 @@
         
         // Update open positions
         function updatePositions() {
-            // Show loading indicator
-            $('#positions-container').html('<div class="loading"><span class="loader"></span></div>');
+            $('#positions-container').addClass('data-loading');
             
             $.get('/positions', function(data) {
                 let positionsHtml = '';
                 
                 if (data.length === 0) {
                     positionsHtml = `
-                        <div class="has-text-centered p-5">
-                            <i class="fas fa-search fa-3x has-text-grey opacity-50 mb-3"></i>
-                            <p class="has-text-grey">No open positions</p>
+                        <div class="empty-state">
+                            <i class="fas fa-search fa-3x"></i>
+                            <p class="empty-state-text">No open positions</p>
                         </div>
                     `;
-                    $('#open-positions-count').text('0/2');
                 } else {
-                    $('#open-positions-count').text(`${data.length}/2`);
-                    
                     data.forEach(function(position) {
                         const profitClass = position.profit_pct >= 0 ? 'profit' : 'loss';
-                        const borderClass = position.profit_pct >= 0 ? 'border-profit' : 'border-loss';
-                        
                         positionsHtml += `
-                            <div class="position-card ${borderClass}">
+                            <div class="position-card">
                                 <div class="position-header">
-                                    <span class="position-symbol">${position.symbol}</span>
-                                    <span class="${profitClass} monospace">
-                                        ${position.profit_pct >= 0 ? '+' : ''}${position.profit_pct.toFixed(2)}%
-                                    </span>
+                                    <div class="position-symbol">${position.symbol}</div>
+                                    <div class="position-time">${position.entry_time}</div>
                                 </div>
-                                <div class="columns is-mobile">
-                                    <div class="column">
-                                        <div class="has-text-grey-light mb-1">Entry Price</div>
-                                        <div class="monospace">${position.entry_price}</div>
+                                <div class="position-body">
+                                    <div class="position-data">
+                                        <div class="position-label">Entry</div>
+                                        <div class="position-value">${position.entry_price}</div>
                                     </div>
-                                    <div class="column">
-                                        <div class="has-text-grey-light mb-1">Current Price</div>
-                                        <div class="monospace">${position.current_price}</div>
+                                    <div class="position-data">
+                                        <div class="position-label">Current</div>
+                                        <div class="position-value">${position.current_price}</div>
                                     </div>
-                                    <div class="column">
-                                        <div class="has-text-grey-light mb-1">Quantity</div>
-                                        <div class="monospace">${position.quantity}</div>
+                                    <div class="position-data">
+                                        <div class="position-label">Quantity</div>
+                                        <div class="position-value">${position.quantity}</div>
                                     </div>
-                                </div>
-                                <div class="is-size-7 has-text-grey-light mt-3">
-                                    <i class="far fa-clock mr-1"></i> Opened at ${position.entry_time}
+                                    <div class="position-data">
+                                        <div class="position-label">Profit</div>
+                                        <div class="position-value ${profitClass}">${position.profit_pct.toFixed(2)}%</div>
+                                    </div>
                                 </div>
                             </div>
                         `;
@@ -1082,80 +947,57 @@
                 }
                 
                 $('#positions-container').html(positionsHtml);
+                $('#positions-container').removeClass('data-loading');
             });
         }
         
-        // Update statistics and chart
+        // Update statistics
         function updateStats() {
-            $('#stats-container').html('<div class="loading"><span class="loader"></span></div>');
+            $('#stats-container').addClass('data-loading');
             
             $.get('/stats', function(data) {
                 const totalProfitClass = data.total_profit_pct >= 0 ? 'profit' : 'loss';
                 const avgProfitClass = data.average_profit_per_trade >= 0 ? 'profit' : 'loss';
                 
-                $('#total-trades').text(data.total_trades);
-                $('#win-rate').text(`${data.win_rate.toFixed(1)}%`);
-                $('#total-profit').text(`${data.total_profit_pct >= 0 ? '+' : ''}${data.total_profit_pct.toFixed(2)}%`);
-                
-                if (data.total_profit_pct >= 0) {
-                    $('#total-profit').addClass('profit').removeClass('loss');
-                } else {
-                    $('#total-profit').addClass('loss').removeClass('profit');
-                }
-                
                 const statsHtml = `
-                    <table class="table is-fullwidth">
+                    <table class="data-table">
                         <tbody>
                             <tr>
-                                <td>Total Trades</td>
-                                <td class="has-text-right">${data.total_trades}</td>
+                                <th>Total Trades</th>
+                                <td>${data.total_trades}</td>
                             </tr>
                             <tr>
-                                <td>Winning Trades</td>
-                                <td class="has-text-right">${data.winning_trades}</td>
+                                <th>Winning Trades</th>
+                                <td>${data.winning_trades}</td>
                             </tr>
                             <tr>
-                                <td>Losing Trades</td>
-                                <td class="has-text-right">${data.losing_trades}</td>
+                                <th>Losing Trades</th>
+                                <td>${data.losing_trades}</td>
                             </tr>
                             <tr>
-                                <td>Win Rate</td>
-                                <td class="has-text-right">${data.win_rate.toFixed(2)}%</td>
+                                <th>Win Rate</th>
+                                <td>${data.win_rate.toFixed(2)}%</td>
                             </tr>
                             <tr>
-                                <td>Total Profit</td>
-                                <td class="has-text-right ${totalProfitClass}">
-                                    ${data.total_profit_pct >= 0 ? '+' : ''}${data.total_profit_pct.toFixed(2)}%
-                                </td>
+                                <th>Total Profit</th>
+                                <td class="${totalProfitClass}">${data.total_profit_pct.toFixed(2)}%</td>
                             </tr>
                             <tr>
-                                <td>Avg. Profit/Trade</td>
-                                <td class="has-text-right ${avgProfitClass}">
-                                    ${data.average_profit_per_trade >= 0 ? '+' : ''}${data.average_profit_per_trade.toFixed(2)}%
-                                </td>
+                                <th>Avg. Profit/Trade</th>
+                                <td class="${avgProfitClass}">${data.average_profit_per_trade.toFixed(2)}%</td>
                             </tr>
                         </tbody>
                     </table>
                 `;
                 
                 $('#stats-container').html(statsHtml);
-                
-                // Update the chart with the trade history
-                $.get('/history', function(historyData) {
-                    // If chart exists, destroy it
-                    if (performanceChart) {
-                        performanceChart.destroy();
-                    }
-                    
-                    // Initialize new chart
-                    initPerformanceChart(historyData);
-                });
+                $('#stats-container').removeClass('data-loading');
             });
         }
         
         // Update trade history
         function updateHistory() {
-            $('#history-tbody').html('<tr><td colspan="6" class="has-text-centered"><i class="fas fa-spinner fa-pulse mr-2"></i> Loading...</td></tr>');
+            $('#history-tbody').addClass('data-loading');
             
             $.get('/history', function(data) {
                 let historyHtml = '';
@@ -1163,20 +1005,10 @@
                 if (data.length === 0) {
                     historyHtml = `
                         <tr>
-                            <td colspan="6" class="has-text-centered">No trade history</td>
+                            <td colspan="5" class="text-center">No trade history</td>
                         </tr>
                     `;
                 } else {
-                    // Check if we have new trades
-                    if (data.length > lastTradeCount) {
-                        lastTradeCount = data.length;
-                        // Flash the trades count
-                        $('#total-trades').addClass('flash-change');
-                        setTimeout(() => {
-                            $('#total-trades').removeClass('flash-change');
-                        }, 1000);
-                    }
-                    
                     data.slice().reverse().forEach(function(trade) {
                         const profitClass = trade.profit_pct >= 0 ? 'profit' : 'loss';
                         historyHtml += `
@@ -1184,8 +1016,7 @@
                                 <td>${trade.symbol}</td>
                                 <td>${trade.entry_price}</td>
                                 <td>${trade.exit_price}</td>
-                                <td>${trade.quantity}</td>
-                                <td class="${profitClass}">${trade.profit_pct >= 0 ? '+' : ''}${trade.profit_pct.toFixed(2)}%</td>
+                                <td class="${profitClass}">${trade.profit_pct.toFixed(2)}%</td>
                                 <td>${trade.exit_time}</td>
                             </tr>
                         `;
@@ -1193,20 +1024,23 @@
                 }
                 
                 $('#history-tbody').html(historyHtml);
+                $('#history-tbody').removeClass('data-loading');
             });
         }
         
         // Update entry conditions with persistent coin display
         function updateEntryConditions() {
-            $('#conditions-container').html('<div class="loading"><span class="loader"></span></div>');
+            $('#conditions-container').addClass('data-loading');
             
             $.get('/entry-conditions', function(data) {
                 if (data.length === 0) {
                     $('#conditions-container').html(`
-                        <div class="has-text-centered p-5">
-                            <p class="has-text-grey">No scan results yet</p>
+                        <div class="empty-state">
+                            <i class="fas fa-search fa-3x"></i>
+                            <p class="empty-state-text">No scan results yet</p>
                         </div>
                     `);
+                    $('#conditions-container').removeClass('data-loading');
                     return;
                 }
                 
@@ -1239,40 +1073,46 @@
                 
                 sortedSymbols.forEach(function(symbol) {
                     const condition = latestConditions[symbol];
+                    const signalClass = condition.entry_signal ? 'signal-buy' : '';
+                    const rsiClass = condition.rsi_condition ? 'has-text-success' : '';
+                    const macdClass = condition.macd_condition ? 'has-text-success' : '';
                     const flashClass = condition.updated ? 'flash-change' : '';
-                    const symbolInitials = symbol.slice(0, -4).substring(0, 2);
                     
                     // Clear the updated flag for next time
                     condition.updated = false;
                     
                     conditionsHtml += `
-                        <div class="coin-item ${flashClass}">
-                            <div class="coin-icon">${symbolInitials}</div>
-                            <div class="coin-info">
-                                <div class="coin-symbol">${symbol}</div>
-                                <div class="coin-metrics">
-                                    <div class="coin-metric">
-                                        <div class="coin-metric-label">Price</div>
-                                        <div class="coin-metric-value">${condition.price.toFixed(4)}</div>
-                                    </div>
-                                    <div class="coin-metric">
-                                        <div class="coin-metric-label">RSI</div>
-                                        <div class="coin-metric-value ${condition.rsi_condition ? 'profit' : ''}">${condition.rsi.toFixed(1)}</div>
-                                    </div>
-                                    <div class="coin-metric">
-                                        <div class="coin-metric-label">MACD</div>
-                                        <div class="coin-metric-value ${condition.macd_condition ? 'profit' : ''}">${condition.macd_histogram.toFixed(6)}</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="coin-signal ${condition.entry_signal ? 'signal-buy' : 'signal-none'}">
-                                ${condition.entry_signal ? 'BUY' : 'WAIT'}
-                            </div>
-                        </div>
+                        <tr class="signal-row ${flashClass} ${signalClass}">
+                            <td class="symbol-cell">${symbol}</td>
+                            <td>${condition.price.toFixed(4)}</td>
+                            <td class="${rsiClass}">${condition.rsi.toFixed(1)}</td>
+                            <td class="${macdClass}">${condition.macd_histogram.toFixed(6)}</td>
+                            <td>
+                                ${condition.entry_signal ? 
+                                    '<span class="tag tag-success">BUY</span>' : 
+                                    '<span class="tag tag-neutral">NO</span>'}
+                            </td>
+                        </tr>
                     `;
                 });
                 
-                $('#conditions-container').html(conditionsHtml);
+                $('#conditions-container').html(`
+                    <table class="signal-table">
+                        <thead>
+                            <tr>
+                                <th>Symbol</th>
+                                <th>Price</th>
+                                <th>RSI</th>
+                                <th>MACD</th>
+                                <th>Signal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${conditionsHtml}
+                        </tbody>
+                    </table>
+                `);
+                $('#conditions-container').removeClass('data-loading');
             });
         }
         
@@ -1284,12 +1124,8 @@
             updateEntryConditions();
         }
         
-        // Update when refresh buttons are clicked
-        $('#refresh-chart').click(function() {
-            updateStats();
-        });
-        
         // Update every 5 seconds if bot is running
+        const botStatus = {{ bot_status|tojson|safe }};
         if (botStatus) {
             setInterval(updateData, 5000);
         }

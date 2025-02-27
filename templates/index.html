@@ -646,55 +646,42 @@
 </head>
 <body>
     <!-- Sidebar navigation -->
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <div class="sidebar-logo">
+    <div class="sidebar">ar-header">
+        <div class="sidebar-header">">
+            <div class="sidebar-logo">-line"></i>
                 <i class="fas fa-chart-line"></i>
                 <span>Tradox</span>
             </div>
         </div>
-        
         <ul class="sidebar-nav">
-            <li class="sidebar-nav-item">
+        <ul class="sidebar-nav">av-item">
+            <li class="sidebar-nav-item">r-nav-link active">
                 <a href="#" class="sidebar-nav-link active">
                     <i class="fas fa-chart-bar"></i>
                     <span>Dashboard</span>
                 </a>
-            </li>
-            <li class="sidebar-nav-item">
+            </li>lass="sidebar-nav-item">
+            <li class="sidebar-nav-item">n" class="sidebar-nav-link">
                 <a href="#" class="sidebar-nav-link">
                     <i class="fas fa-chart-line"></i>
                     <span>Positions</span>
                 </a>
             </li>
             <li class="sidebar-nav-item">
-                <a href="#" class="sidebar-nav-link">
+                <a href="#" class="sidebar-nav-link">: auto;">
                     <i class="fas fa-history"></i>
-                    <span>Trade History</span>
-                </a>
-            </li>
+                    <span>Trade History</span>% if bot_status %}active{% else %}inactive{% endif %}"></div>
+                </a>n>Bot Status: <strong>{% if bot_status %}Running{% else %}Stopped{% endif %}</strong></span>
+            </li>>
             <li class="sidebar-nav-item">
                 <a href="#" class="sidebar-nav-link">
-                    <i class="fas fa-cog"></i>
-                    <span>Settings</span>
-                </a>
-            </li>
-        </ul>
-        
-        <div class="sidebar-footer" style="margin-top: auto;">
-            <div class="sidebar-status">
-                <div class="status-indicator {% if bot_status %}active{% else %}inactive{% endif %}"></div>
-                <span>Bot Status: <strong>{% if bot_status %}Running{% else %}Stopped{% endif %}</strong></span>
-            </div>
-            
-            <div style="margin-top: 1rem;">
-                <span class="mode-tag {% if simulation_mode %}simulation{% else %}live{% endif %}">
-                    <i class="fas {% if simulation_mode %}fa-vial{% else %}fa-broadcast-tower{% endif %} mr-1"></i>
-                    {% if simulation_mode %}Simulation{% else %}LIVE{% endif %}
-                </span>
-            </div>
+                    <i class="fas fa-cog"></i>on">
+                    <span>Settings</span> mr-1"></i>
+                </a>Simulation Mode
+            </li>/span>
+        </ul>/div>
         </div>
-    </div>
+        <div class="sidebar-footer" style="margin-top: auto;">
 
     <!-- Main content area -->
     <div class="main-content">
@@ -720,46 +707,38 @@
             {% endif %}
         {% endwith %}
 
-        <!-- Trading controls -->
-        <div class="controls-panel">
-            <div class="controls-grid">
-                <div class="coin-input">
-                    <div class="control-title">Configure Trading Pairs</div>
-                    <form action="/start" method="post">
-                        <label for="coins">Trading Pairs</label>
+        <!-- Settings Section -->
+        <div id="settings-section" class="card mb-5">
+            <div class="card-header">
+                <h2 class="card-title">
+                    <i class="fas fa-cog"></i>
+                    Bot Settings
+                </h2>
+            </div>
+            <div class="card-content p-5">
+                <form action="/start" method="post">
+                    <div class="field">
+                        <label for="coins" class="control-title">Trading Coins</label>
                         <input type="text" class="input" id="coins" name="coins" placeholder="BTC,ETH,SOL,DOGE" required>
                         <p class="input-help">Enter coin symbols separated by commas (without USDT)</p>
-                        
-                        <button type="submit" class="btn btn-primary" style="margin-top: 1rem;" {% if bot_status %}disabled{% endif %}>
-                            <i class="fas fa-play"></i> Start Trading
-                        </button>
-                    </form>
-                </div>
-
-                <div class="bot-controls">
-                    <div class="control-title">Bot Controls</div>
-                    <p style="color: var(--color-text-muted); margin-bottom: 1rem;">
-                        Control the trading bot operation and mode.
-                    </p>
+                    </div>
                     
-                    <div class="action-buttons">
-                        <form action="/stop" method="post">
-                            <button type="submit" class="btn btn-danger" {% if not bot_status %}disabled{% endif %}>
+                    <div class="field" style="margin-top: 1.5rem;">
+                        <div class="action-buttons">
+                            <button type="submit" class="btn btn-primary" {% if bot_status %}disabled{% endif %}>
+                                <i class="fas fa-play"></i> Start Trading Bot
+                            </button>
+                            
+                            <button type="button" class="btn btn-danger" onclick="stopBot()" {% if not bot_status %}disabled{% endif %}>
                                 <i class="fas fa-stop"></i> Stop Bot
                             </button>
-                        </form>
-                        
-                        <form action="/toggle-mode" method="post">
-                            <button type="submit" class="btn btn-warning" {% if bot_status %}disabled{% endif %}>
-                                <i class="fas fa-sync-alt"></i>
-                                {% if simulation_mode %}Switch to LIVE Mode{% else %}Switch to SIMULATION Mode{% endif %}
-                            </button>
-                        </form>
+                        </div>
                     </div>
-                </div>
+                </form>
             </div>
         </div>
 
+        <!-- Dashboard Grid -->
         <div class="dashboard-grid">
             <!-- Left Column -->
             <div>
@@ -1133,6 +1112,66 @@
         // Initial data load
         $(document).ready(function() {
             updateData();
+        });
+    </script>
+</body>
+</html>
+                if(data.status === "success") {
+                    // Show notification
+                    const notification = `
+                        <div class="notification is-info">
+                            <button class="delete">&times;</button>
+                            Bot has been stopped.
+                        </div>
+                    `;
+                    
+                    // Insert notification at the top of main content
+                    $(notification).insertAfter('.header-bar');
+                    
+                    // Update status indicator
+                    $('.status-indicator').removeClass('active').addClass('inactive');
+                    $('#bot-status-text').text('Stopped');
+                    
+                    // Disable stop button, enable start button
+                    $('button[onclick="stopBot()"]').attr('disabled', true);
+                    $('.btn.btn-primary[type="submit"]').removeAttr('disabled');
+                    
+                    // Setup delete button functionality for the new notification
+                    $('.notification .delete').on('click', function() {
+                        $(this).parent().remove();
+                    });
+                }
+            });
+        }
+        
+        // Add click handler for switching between dashboard and settings
+        $(document).ready(function() {
+            // Initial data load
+            updateData();
+            
+            // Handle sidebar navigation
+            $('.sidebar-nav-link').on('click', function(e) {
+                e.preventDefault();
+                
+                // Remove active class from all links
+                $('.sidebar-nav-link').removeClass('active');
+                
+                // Add active class to clicked link
+                $(this).addClass('active');
+                
+                // If settings link clicked, show settings and hide dashboard
+                if($(this).attr('href') === '#settings-section') {
+                    $('#settings-section').show();
+                    $('.dashboard-grid').hide();
+                } else {
+                    // Otherwise show dashboard and hide settings
+                    $('#settings-section').hide();
+                    $('.dashboard-grid').show();
+                }
+            });
+            
+            // Initially hide settings since dashboard is active by default
+            $('#settings-section').hide();
         });
     </script>
 </body>

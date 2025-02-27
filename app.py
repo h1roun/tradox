@@ -12,12 +12,12 @@ load_dotenv()
 app = Flask(__name__, static_folder='static', static_url_path='/static')
 app.secret_key = os.urandom(24)
 
-# Initialize trading bot (default to simulation mode for safety)
-simulation_mode = True  # Default to simulation mode
+# Initialize trading bot (simulation mode only)
+simulation_mode = True  # Always simulation mode
 bot = TradingBot(
     api_key=os.getenv("BINANCE_API_KEY"),
     api_secret=os.getenv("BINANCE_API_SECRET"),
-    simulation_mode=simulation_mode
+    simulation_mode=True
 )
 
 # Bot control thread
@@ -53,7 +53,7 @@ def index():
     return render_template('index.html', 
                           bot_status=bot_running,
                           positions=bot.get_open_positions(),
-                          simulation_mode=simulation_mode,
+                          simulation_mode=True,  # Always True
                           stats=bot.get_performance_stats())
 
 @app.route('/start', methods=['POST'])
@@ -73,10 +73,7 @@ def start_bot():
         bot_thread = threading.Thread(target=bot_loop)
         bot_thread.daemon = True
         bot_thread.start()
-        if simulation_mode:
-            flash("Bot started with REAL market data but SIMULATED trades. No real orders will be executed.")
-        else:
-            flash("Bot started in LIVE mode. REAL trades will be executed!")
+        flash("Bot started in SIMULATION mode with REAL market data. No real orders will be executed.")
     else:
         flash("Bot is already running!")
     
@@ -89,31 +86,7 @@ def stop_bot():
     flash("Bot has been stopped.")
     return redirect(url_for('index'))
 
-@app.route('/toggle-mode', methods=['POST'])
-def toggle_mode():
-    global bot, simulation_mode, bot_running
-    
-    # Can't change mode while bot is running
-    if bot_running:
-        flash("Stop the bot before changing simulation mode!")
-        return redirect(url_for('index'))
-    
-    # Toggle mode
-    simulation_mode = not simulation_mode
-    
-    # Re-initialize the bot with new mode
-    bot = TradingBot(
-        api_key=os.getenv("BINANCE_API_KEY"),
-        api_secret=os.getenv("BINANCE_API_SECRET"),
-        simulation_mode=simulation_mode
-    )
-    
-    if simulation_mode:
-        flash("Switched to SIMULATION mode with real market data. No real trades will be executed.")
-    else:
-        flash("Switched to LIVE mode. WARNING: Real trades will be executed!")
-    
-    return redirect(url_for('index'))
+# Remove the toggle-mode route since we're always in simulation mode
 
 @app.route('/positions')
 def positions():
@@ -130,6 +103,13 @@ def history():
 @app.route('/entry-conditions')
 def entry_conditions():
     return jsonify(bot.get_entry_conditions())
+
+# Add JavaScript endpoint for stopping the bot
+@app.route('/api/stop', methods=['POST'])
+def api_stop_bot():
+    global bot_running
+    bot_running = False
+    return jsonify({"status": "success", "message": "Bot stopped successfully"})
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

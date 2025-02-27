@@ -168,7 +168,7 @@ class TradingBot:
         prev_macd_histogram = df['macd_histogram'].iloc[-2]
         
         # Entry condition: RSI < 30 (oversold) and MACD histogram turning positive
-        rsi_condition = current_rsi < 30
+        rsi_condition = current_rsi < 40
         macd_condition = macd_histogram > 0 and prev_macd_histogram < 0
         
         entry_condition = rsi_condition and macd_condition

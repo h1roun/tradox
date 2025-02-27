@@ -4,841 +4,360 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tradox - Crypto Trading Bot</title>
-    <!-- Bulma CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- Google Font -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Audio for notifications -->
+    <audio id="notificationSound" preload="auto">
+        <source src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" type="audio/mp3">
+    </audio>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        dark: {
+                            DEFAULT: '#0a0e17',
+                            secondary: '#141d2b',
+                            card: '#1a2332',
+                            border: '#2a3543'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        /* Modern Render-style Theme - Dark Mode Only */
-        :root {
-            /* Dark theme colors */
-            --bg-main: #0f172a;
-            --bg-sidebar: #1e293b;
-            --bg-card: #1e293b;
-            --bg-code: #334155;
-            --bg-hover: #2d3748;
-            
-            --color-text: #e2e8f0;
-            --color-text-muted: #94a3b8;
-            --color-heading: #f1f5f9;
-            
-            --color-primary: #4f46e5;
-            --color-primary-hover: #4338ca;
-            --color-primary-light: #3b358997;
-            
-            --color-success: #10b981;
-            --color-success-light: #057a5520;
-            --color-danger: #ef4444;
-            --color-danger-light: #dc262620;
-            --color-warning: #f59e0b;
-            --color-warning-light: #d9770620;
-            --color-info: #0ea5e9;
-            --color-info-light: #0284c720;
-            
-            --border-color: #334155;
-            --border-radius: 8px;
-            
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.25);
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
-            --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
-            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+        /* Animations and transitions */
+        @keyframes slideIn {
+            from { transform: translateY(-10px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-main);
-            color: var(--color-text);
-            min-height: 100vh;
-            display: flex;
-        }
-        
-        /* Sidebar styling */
-        .sidebar {
-            background-color: var(--bg-sidebar);
-            width: 240px;
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 100vh;
-            overflow-y: auto;
-            border-right: 1px solid var(--border-color);
-            padding: 1.5rem 0;
-        }
-        
-        .sidebar-header {
-            padding: 0 1.5rem 1.5rem;
-            border-bottom: 1px solid var(--border-color);
-            margin-bottom: 1.5rem;
-        }
-        
-        .sidebar-logo {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--color-primary);
-            display: flex;
-            align-items: center;
-        }
-        
-        .sidebar-logo i {
-            margin-right: 0.75rem;
-        }
-        
-        .sidebar-nav {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-        
-        .sidebar-nav-item {
-            margin-bottom: 0.25rem;
-        }
-        
-        .sidebar-nav-link {
-            display: flex;
-            align-items: center;
-            padding: 0.75rem 1.5rem;
-            color: var(--color-text-muted);
-            text-decoration: none !important;
-            font-weight: 500;
-            transition: all 0.2s;
-            border-left: 3px solid transparent;
-        }
-        
-        .sidebar-nav-link:hover {
-            background-color: var(--bg-hover);
-            color: var(--color-primary);
-        }
-        
-        .sidebar-nav-link.active {
-            background-color: var(--color-primary-light);
-            color: var(--color-primary);
-            border-left-color: var(--color-primary);
-        }
-        
-        .sidebar-nav-link i {
-            margin-right: 0.75rem;
-            width: 20px;
-            text-align: center;
-        }
-        
-        .sidebar-footer {
-            padding: 1.5rem;
-            border-top: 1px solid var(--border-color);
-            margin-top: auto;
-        }
-        
-        .sidebar-status {
-            display: flex;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-        
-        .status-indicator {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            margin-right: 0.75rem;
-        }
-        
-        .status-indicator.active {
-            background-color: var(--color-success);
-            box-shadow: 0 0 8px var(--color-success);
-        }
-        
-        .status-indicator.inactive {
-            background-color: var(--color-danger);
-        }
-        
-        /* Main content area */
-        .main-content {
-            flex: 1;
-            margin-left: 240px;
-            padding: 2rem;
-        }
-        
-        /* Header bar */
-        .header-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-        }
-        
-        .page-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--color-heading);
-        }
-        
-        .header-actions {
-            display: flex;
-            align-items: center;
-        }
-        
-        .time-display {
-            background-color: var(--bg-code);
-            padding: 0.5rem 0.75rem;
-            border-radius: var(--border-radius);
-            color: var(--color-text-muted);
-            font-size: 0.85rem;
-            margin-left: 1rem;
-        }
-        
-        /* Cards */
-        .card {
-            background-color: var(--bg-card);
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow);
-            margin-bottom: 1.5rem;
-            border: 1px solid var(--border-color);
-            overflow: hidden;
-        }
-        
-        .card-header {
-            padding: 1.25rem;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: var(--bg-card);
-        }
-        
-        .card-title {
-            margin: 0;
-            font-weight: 600;
-            font-size: 1rem;
-            color: var(--color-heading);
-            display: flex;
-            align-items: center;
-        }
-        
-        .card-title i {
-            margin-right: 0.5rem;
-            color: var(--color-text-muted);
-        }
-        
-        .card-content {
-            padding: 1.5rem;
-        }
-        
-        /* Trading controls panel */
-        .controls-panel {
-            background-color: var(--color-primary-light);
-            border-radius: var(--border-radius);
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-        }
-        
-        .controls-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.5rem;
-        }
-        
-        .coin-input {
-            background-color: var (--bg-card);
-            border-radius: var(--border-radius);
-            padding: 1.5rem;
-            box-shadow: var(--shadow-sm);
-        }
-        
-        .bot-controls {
-            background-color: var(--bg-card);
-            border-radius: var(--border-radius);
-            padding: 1.5rem;
-            box-shadow: var(--shadow-sm);
-        }
-        
-        .control-title {
-            font-weight: 600;
-            color: var(--color-heading);
-            margin-bottom: 1rem;
-        }
-        
-        /* Action buttons */
-        .action-buttons {
-            display: flex;
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-        
-        .btn {
-            padding: 0.75rem 1.25rem;
-            border-radius: var(--border-radius);
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s;
-            border: none;
-        }
-        
-        .btn i {
-            margin-right: 0.5rem;
-        }
-        
-        .btn-primary {
-            background-color: var(--color-primary);
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            background-color: var(--color-primary-hover);
-        }
-        
-        .btn-danger {
-            background-color: var(--color-danger);
-            color: white;
-        }
-        
-        .btn-danger:hover {
-            background-color: #dc2626;
-        }
-        
-        .btn-warning {
-            background-color: var(--color-warning);
-            color: white;
-        }
-        
-        .btn-warning:hover {
-            background-color: #d97706;
-        }
-        
-        .btn-outline {
-            border: 1px solid var(--border-color);
-            background-color: transparent;
-            color: var(--color-text-muted);
-        }
-        
-        .btn-outline:hover {
-            background-color: var(--bg-hover);
-            color: var(--color-text);
-        }
-        
-        /* Inputs */
-        .input {
-            width: 100%;
-            padding: 0.75rem 1rem;
-            border: 1px solid var(--border-color);
-            border-radius: var (--border-radius);
-            background-color: var(--bg-main);
-            color: var(--color-text);
-            transition: all 0.2s;
-        }
-        
-        .input:focus {
-            outline: none;
-            border-color: var(--color-primary);
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-        }
-        
-        .input-help {
-            font-size: 0.8rem;
-            color: var(--color-text-muted);
-            margin-top: 0.5rem;
-        }
-        
-        /* Dashboard grid */
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1.5rem;
-        }
-        
-        /* Mode tags */
-        .mode-tag {
-            display: inline-flex;
-            align-items: center;
-            padding: 0.25rem 0.75rem;
-            font-size: 0.8rem;
-            font-weight: 600;
-            border-radius: 100px;
-            margin-left: 0.75rem;
-        }
-        
-        .mode-tag.simulation {
-            background-color: var(--color-info-light);
-            color: var(--color-info);
-        }
-        
-        .mode-tag.live {
-            background-color: var(--color-danger-light);
-            color: var(--color-danger);
-        }
-        
-        /* Tables */
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        
-        .data-table th {
-            text-align: left;
-            font-weight: 600;
-            font-size: 0.85rem;
-            color: var(--color-text-muted);
-            text-transform: uppercase;
-            padding: 0.75rem 1rem;
-            border-bottom: 1px solid var(--border-color);
-        }
-        
-        .data-table td {
-            padding: 1rem;
-            border-bottom: 1px solid var(--border-color);
-        }
-        
-        .data-table tr:last-child td {
-            border-bottom: none;
-        }
-        
-        .data-table tr:hover td {
-            background-color: var(--bg-hover);
-        }
-        
-        /* Entry Signal Monitor */
-        .signal-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: -1rem; /* To offset the card padding */
-        }
-        
-        .signal-table th {
-            position: sticky;
-            top: 0;
-            background-color: var(--bg-card);
-            z-index: 10;
-            padding: 1rem;
-            text-align: left;
-            font-weight: 500;
-            color: var(--color-text-muted);
-            border-bottom: 1px solid var(--border-color);
-        }
-        
-        .signal-table td {
-            padding: 0.75rem 1rem;
-            border-bottom: 1px solid var(--border-color);
-        }
-        
-        .signal-table tr:last-child td {
-            border-bottom: none;
-        }
-        
-        .signal-table .symbol-cell {
-            font-weight: 500;
-            color: var (--color-heading);
-        }
-        
-        .signal-row:hover td {
-            background-color: var(--bg-hover);
-        }
-        
-        .signal-row.signal-buy td {
-            background-color: var(--color-success-light);
-        }
-        
-        .signal-row.signal-buy:hover td {
-            background-color: #d1fae5;
-        }
-        
-        /* Tags */
-        .tag {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0.25rem 0.5rem;
-            font-size: 0.75rem;
-            font-weight: 600;
-            border-radius: 4px;
-        }
-        
-        .tag-success {
-            background-color: var(--color-success-light);
-            color: var(--color-success);
-        }
-        
-        .tag-neutral {
-            background-color: var(--bg-code);
-            color: var(--color-text-muted);
-        }
-        
-        /* Positions */
-        .position-card {
-            display: flex;
-            flex-direction: column;
-            background-color: var(--bg-card);
-            border-radius: var(--border-radius);
-            border: 1px solid var(--border-color);
-            margin-bottom: 1rem;
-            overflow: hidden;
-        }
-        
-        .position-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem;
-            background-color: var(--bg-code);
-        }
-        
-        .position-symbol {
-            font-weight: 600;
-            font-size: 1.1rem;
-            color: var(--color-heading);
-        }
-        
-        .position-time {
-            font-size: 0.85rem;
-            color: var(--color-text-muted);
-        }
-        
-        .position-body {
-            padding: 1rem;
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1rem;
-        }
-        
-        .position-data {
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .position-label {
-            font-size: 0.85rem;
-            font-weight: 500;
-            color: var(--color-text-muted);
-            margin-bottom: 0.25rem;
-        }
-        
-        .position-value {
-            font-weight: 600;
-            color: var(--color-heading);
-        }
         
-        .profit {
-            color: var(--color-success);
-            font-weight: 700;
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
         }
         
-        .loss {
-            color: var(--color-danger);
-            font-weight: 700;
+        .animate-slide-in {
+            animation: slideIn 0.3s ease-out;
         }
         
-        .scrollable-area {
-            max-height: 400px;
-            overflow-y: auto;
-            padding: 0 1px; /* Prevents shadow cutoff */
+        .animate-pulse-custom {
+            animation: pulse 2s infinite;
         }
         
-        /* Custom Scrollbar */
+        /* Scrollbar styling */
         ::-webkit-scrollbar {
-            width: 8px;
+            width: 6px;
+            height: 6px;
         }
         
         ::-webkit-scrollbar-track {
-            background: var(--bg-main);
-            border-radius: 4px;
+            background: rgba(75, 85, 99, 0.1);
+            border-radius: 3px;
         }
         
         ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 4px;
-        }
-        
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
-        }
-        
-        /* Notifications */
-        .notification {
-            background-color: var(--bg-card);
-            border-left: 4px solid var(--color-info);
-            padding: 1rem 1.5rem;
-            margin-bottom: 1.5rem;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow);
-            position: relative;
-        }
-        
-        .notification.is-info {
-            background-color: var(--color-info-light);
-        }
-        
-        .notification .delete {
-            position: absolute;
-            right: 1rem;
-            top: 1rem;
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: var(--color-text-muted);
-        }
-        
-        .notification .delete:hover {
-            color: var(--color-text);
-        }
-        
-        .empty-state {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 3rem;
-            text-align: center;
-        }
-        
-        .empty-state i {
-            font-size: 2.5rem;
-            color: var(--color-text-muted);
-            margin-bottom: 1rem;
-        }
-        
-        .empty-state-text {
-            color: var(--color-text-muted);
-        }
-        
-        /* Loading spinner */
-        .loading-spinner {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 3rem;
-            opacity: 0.7;
-        }
-        
-        /* Flashing animation */
-        .flash-change {
-            animation: flash-animation 1s ease-out;
+            background: rgba(75, 85, 99, 0.5);
+            border-radius: 3px;
         }
         
         @keyframes flash-animation {
-            0% { background-color: rgba(79, 70, 229, 0.2); }
+            0% { background-color: rgba(59, 130, 246, 0.3); }
             100% { background-color: transparent; }
         }
         
-        /* Refresh button */
-        .refresh-button {
-            background: none;
-            border: none;
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            color: var(--color-text-muted);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
+        .flash-change {
+            animation: flash-animation 1s ease-out;
+        }
+
+        /* Tables */
+        .trades-table th, .trades-table td {
+            white-space: nowrap;
+            padding: 0.5rem 1rem;
         }
         
-        .refresh-button:hover {
-            background-color: var(--bg-hover);
-            color: var(--color-heading);
+        .trades-table {
+            min-width: 100%;
+            table-layout: fixed;
+        }
+        
+        .trades-table th {
+            text-align: left;
+            font-weight: 500;
+        }
+        
+        .trades-table td {
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Scanner panel styling */
+        .scanner-panel {
+            background: linear-gradient(to bottom, rgba(17, 24, 39, 0.8), rgba(17, 24, 39, 1));
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(75, 85, 99, 0.2);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        /* Loading spinner animation */
+        @keyframes spinner {
+            to {transform: rotate(360deg);}
+        }
+
+        .animate-spin {
+            animation: spinner 1s linear infinite;
         }
     </style>
 </head>
-<body>
-    <!-- Sidebar navigation -->
-    <div class="sidebar">ar-header">
-        <div class="sidebar-header">">
-            <div class="sidebar-logo">-line"></i>
-                <i class="fas fa-chart-line"></i>
-                <span>Tradox</span>
-            </div>
-        </div>
-        <ul class="sidebar-nav">
-        <ul class="sidebar-nav">av-item">
-            <li class="sidebar-nav-item">r-nav-link active">
-                <a href="#" class="sidebar-nav-link active">
-                    <i class="fas fa-chart-bar"></i>
-                    <span>Dashboard</span>
-                </a>
-            </li>lass="sidebar-nav-item">
-            <li class="sidebar-nav-item">n" class="sidebar-nav-link">
-                <a href="#" class="sidebar-nav-link">
-                    <i class="fas fa-chart-line"></i>
-                    <span>Positions</span>
-                </a>
-            </li>
-            <li class="sidebar-nav-item">
-                <a href="#" class="sidebar-nav-link">: auto;">
-                    <i class="fas fa-history"></i>
-                    <span>Trade History</span>% if bot_status %}active{% else %}inactive{% endif %}"></div>
-                </a>n>Bot Status: <strong>{% if bot_status %}Running{% else %}Stopped{% endif %}</strong></span>
-            </li>>
-            <li class="sidebar-nav-item">
-                <a href="#" class="sidebar-nav-link">
-                    <i class="fas fa-cog"></i>on">
-                    <span>Settings</span> mr-1"></i>
-                </a>Simulation Mode
-            </li>/span>
-        </ul>/div>
-        </div>
-        <div class="sidebar-footer" style="margin-top: auto;">
 
-    <!-- Main content area -->
-    <div class="main-content">
-        <div class="header-bar">
-            <h1 class="page-title">Trading Dashboard</h1>
-            <div class="header-actions">
-                <div class="time-display" id="current-time">
-                    <i class="far fa-clock mr-1"></i>
-                    Loading...
+<body class="bg-dark text-white">
+    <div class="container mx-auto p-6 font-sans">
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-8">
+            <h1 class="text-4xl font-bold flex items-center">
+                Tradox Trading Bot
+                {% if simulation_mode %}
+                <span class="ml-3 text-xs bg-blue-600 text-white px-3 py-1 rounded-full">SIMULATION</span>
+                {% else %}
+                <span class="ml-3 text-xs bg-red-600 text-white px-3 py-1 rounded-full">LIVE TRADING</span>
+                {% endif %}
+            </h1>
+            
+            <!-- Bot Status -->
+            <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-2 bg-dark-secondary rounded-lg px-4 py-2">
+                    <div class="h-2 w-2 rounded-full {% if bot_status %}bg-green-500 animate-pulse-custom{% else %}bg-red-500{% endif %}"></div>
+                    <span class="text-gray-300" id="bot-status-text">{% if bot_status %}Running{% else %}Stopped{% endif %}</span>
                 </div>
+                <div id="current-time" class="text-gray-400 text-sm"></div>
             </div>
         </div>
 
-        <!-- Notifications -->
+        <!-- Flash Messages -->
         {% with messages = get_flashed_messages() %}
             {% if messages %}
                 {% for message in messages %}
-                    <div class="notification is-info">
-                        <button class="delete">&times;</button>
-                        {{ message }}
+                    <div class="bg-gray-800 border border-gray-700 text-white px-4 py-3 rounded mb-4 flex justify-between animate-slide-in">
+                        <span>{{ message }}</span>
+                        <button class="message-close focus:outline-none">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
                     </div>
                 {% endfor %}
             {% endif %}
         {% endwith %}
 
-        <!-- Settings Section -->
-        <div id="settings-section" class="card mb-5">
-            <div class="card-header">
-                <h2 class="card-title">
-                    <i class="fas fa-cog"></i>
-                    Bot Settings
-                </h2>
+        <!-- Bot Controls Panel -->
+        <div class="bg-dark-secondary border border-dark-border rounded-lg p-6 mb-8">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-xl font-bold">Bot Control</h2>
+                <div class="w-48 h-2 bg-gray-800 rounded-full overflow-hidden">
+                    <div id="scan_progress" class="h-full bg-blue-500 transition-all duration-300" style="width: 0%"></div>
+                </div>
             </div>
-            <div class="card-content p-5">
-                <form action="/start" method="post">
-                    <div class="field">
-                        <label for="coins" class="control-title">Trading Coins</label>
-                        <input type="text" class="input" id="coins" name="coins" placeholder="BTC,ETH,SOL,DOGE" required>
-                        <p class="input-help">Enter coin symbols separated by commas (without USDT)</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Bot Controls -->
+                <div class="space-y-4">
+                    <form action="/start" method="post">
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-300 mb-1">Coins to Trade (comma separated)</label>
+                            <input class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white" 
+                                   type="text" name="coins" id="coins" placeholder="BTC,ETH,SOL,DOGE" required>
+                            <p class="mt-1 text-xs text-gray-400">Enter coin symbols without USDT (e.g., BTC, ETH)</p>
+                        </div>
+                        <button type="submit" class="w-full px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors duration-200 flex items-center justify-center"
+                                {% if bot_status %}disabled{% endif %}>
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            Start Bot
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- Control Buttons -->
+                <div class="space-y-4">
+                    <div class="flex space-x-4">
+                        <form action="/stop" method="post" class="w-1/2">
+                            <button type="submit" class="w-full px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors duration-200 flex items-center justify-center"
+                                    {% if not bot_status %}disabled{% endif %}>
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" />
+                                </svg>
+                                Stop Bot
+                            </button>
+                        </form>
+                        
+                        <form action="/toggle-mode" method="post" class="w-1/2">
+                            <button type="submit" class="w-full px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg transition-colors duration-200 flex items-center justify-center"
+                                    {% if bot_status %}disabled{% endif %}>
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                </svg>
+                                {% if simulation_mode %}Switch to LIVE Mode{% else %}Switch to SIMULATION Mode{% endif %}
+                            </button>
+                        </form>
                     </div>
                     
-                    <div class="field" style="margin-top: 1.5rem;">
-                        <div class="action-buttons">
-                            <button type="submit" class="btn btn-primary" {% if bot_status %}disabled{% endif %}>
-                                <i class="fas fa-play"></i> Start Trading Bot
-                            </button>
-                            
-                            <button type="button" class="btn btn-danger" onclick="stopBot()" {% if not bot_status %}disabled{% endif %}>
-                                <i class="fas fa-stop"></i> Stop Bot
-                            </button>
+                    <div class="grid grid-cols-3 gap-4">
+                        <div class="bg-gray-800 rounded-lg p-3 text-center">
+                            <div class="text-xs text-gray-400">Total Trades</div>
+                            <div class="text-xl font-bold" id="total-trades-count">{{ stats.total_trades }}</div>
                         </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <!-- Dashboard Grid -->
-        <div class="dashboard-grid">
-            <!-- Left Column -->
-            <div>
-                <!-- Open Positions Card -->
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="card-title">
-                            <i class="fas fa-chart-line"></i>
-                            Open Positions (Max: 2)
-                        </h2>
-                        <button class="refresh-button" onclick="updatePositions()">
-                            <i class="fas fa-sync-alt"></i>
-                        </button>
-                    </div>
-                    <div class="card-content" id="positions-container">
-                        <div class="loading-spinner">
-                            <i class="fas fa-spinner fa-pulse fa-2x"></i>
-                            <p>Loading positions...</p>
+                        <div class="bg-gray-800 rounded-lg p-3 text-center">
+                            <div class="text-xs text-gray-400">Win Rate</div>
+                            <div class="text-xl font-bold text-green-500" id="win-rate">{{ "%.1f"|format(stats.win_rate) }}%</div>
+                        </div>
+                        <div class="bg-gray-800 rounded-lg p-3 text-center">
+                            <div class="text-xs text-gray-400">Total Profit</div>
+                            <div class="text-xl font-bold {% if stats.total_profit_pct >= 0 %}text-green-500{% else %}text-red-500{% endif %}" 
+                                 id="total-profit">{{ "%.2f"|format(stats.total_profit_pct) }}%</div>
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
 
-                <!-- Performance Stats Card -->
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="card-title">
-                            <i class="fas fa-chart-bar"></i>
-                            Performance Statistics
-                        </h2>
-                        <button class="refresh-button" onclick="updateStats()">
-                            <i class="fas fa-sync-alt"></i>
-                        </button>
-                    </div>
-                    <div class="card-content" id="stats-container">
-                        <div class="loading-spinner">
-                            <i class="fas fa-spinner fa-pulse fa-2x"></i>
-                            <p>Loading statistics...</p>
+        <!-- Main Content Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Left Column: Open Positions -->
+            <div class="scanner-panel rounded-lg p-6 overflow-hidden">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold">Open Positions</h3>
+                    <button class="refresh-button p-1 hover:bg-gray-700 rounded" onclick="updatePositions()">
+                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                    </button>
+                </div>
+                <div id="positions-container" class="space-y-4 overflow-y-auto max-h-[520px]">
+                    <!-- Will be populated via JavaScript -->
+                    <div class="flex justify-center items-center h-40">
+                        <div class="text-center">
+                            <svg class="animate-spin h-8 w-8 text-blue-500 mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <p class="text-gray-400">Loading positions...</p>
                         </div>
                     </div>
                 </div>
             </div>
             
-            <!-- Right Column -->
-            <div>
-                <!-- Entry Signals Card -->
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="card-title">
-                            <i class="fas fa-search"></i>
-                            Entry Signal Monitor
-                        </h2>
-                        <button class="refresh-button" onclick="updateEntryConditions()">
-                            <i class="fas fa-sync-alt"></i>
-                        </button>
-                    </div>
-                    <div class="card-content" style="padding: 0;">
-                        <div class="scrollable-area" id="conditions-container">
-                            <div class="loading-spinner">
-                                <i class="fas fa-spinner fa-pulse fa-2x"></i>
-                                <p>Loading signals...</p>
-                            </div>
+            <!-- Middle Column: Entry Signal Monitor -->
+            <div class="scanner-panel rounded-lg p-6 overflow-hidden">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold">Entry Signal Monitor</h3>
+                    <button class="refresh-button p-1 hover:bg-gray-700 rounded" onclick="updateEntryConditions()">
+                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="grid grid-cols-5 gap-2 mb-2 px-2">
+                    <div class="text-xs text-gray-400">Symbol</div>
+                    <div class="text-xs text-gray-400 text-right">Price</div>
+                    <div class="text-xs text-gray-400 text-right">RSI</div>
+                    <div class="text-xs text-gray-400 text-right">MACD</div>
+                    <div class="text-xs text-gray-400 text-center">Signal</div>
+                </div>
+                <div id="conditions-container" class="space-y-1 overflow-y-auto max-h-[480px]">
+                    <!-- Will be populated via JavaScript -->
+                    <div class="flex justify-center items-center h-40">
+                        <div class="text-center">
+                            <svg class="animate-spin h-8 w-8 text-blue-500 mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <p class="text-gray-400">Loading market data...</p>
                         </div>
                     </div>
                 </div>
-
-                <!-- Trade History Card -->
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="card-title">
-                            <i class="fas fa-history"></i>
-                            Trade History
-                        </h2>
-                        <button class="refresh-button" onclick="updateHistory()">
-                            <i class="fas fa-sync-alt"></i>
-                        </button>
-                    </div>
-                    <div class="card-content" style="padding: 0;">
-                        <div class="scrollable-area">
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>Symbol</th>
-                                        <th>Entry</th>
-                                        <th>Exit</th>
-                                        <th>Profit</th>
-                                        <th>Time</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="history-tbody">
-                                    <tr>
-                                        <td colspan="5" class="text-center">
-                                            <div class="loading-spinner" style="padding: 1.5rem;">
-                                                <i class="fas fa-spinner fa-pulse"></i>
-                                                <p>Loading history...</p>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+            </div>
+            
+            <!-- Right Column: Trade History -->
+            <div class="scanner-panel rounded-lg p-6 overflow-hidden">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold">Trade History</h3>
+                    <button class="refresh-button p-1 hover:bg-gray-700 rounded" onclick="updateHistory()">
+                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="overflow-y-auto max-h-[520px]">
+                    <table class="w-full trades-table">
+                        <thead>
+                            <tr class="text-left border-b border-gray-800">
+                                <th>Symbol</th>
+                                <th>Entry</th>
+                                <th>Exit</th>
+                                <th>Profit</th>
+                                <th>Time</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-tbody">
+                            <!-- Will be populated via JavaScript -->
+                            <tr>
+                                <td colspan="5" class="text-center py-8">
+                                    <svg class="animate-spin h-8 w-8 text-blue-500 mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    <p class="text-gray-400">Loading history...</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Performance Stats & Log Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+            <!-- Performance Statistics -->
+            <div class="scanner-panel rounded-lg p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold">Performance Statistics</h3>
+                    <button class="refresh-button p-1 hover:bg-gray-700 rounded" onclick="updateStats()">
+                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                    </button>
+                </div>
+                <div id="stats-container" class="overflow-hidden">
+                    <!-- Will be populated via JavaScript -->
+                    <div class="flex justify-center items-center h-40">
+                        <div class="text-center">
+                            <svg class="animate-spin h-8 w-8 text-blue-500 mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <p class="text-gray-400">Loading stats...</p>
                         </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Live Logs -->
+            <div class="scanner-panel rounded-lg p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold">Live Logs</h3>
+                    <span id="last-update" class="text-sm text-gray-400"></span>
+                </div>
+                <div id="trade_logs" class="h-64 overflow-y-auto space-y-2 text-sm border border-gray-800 rounded p-2">
+                    <!-- Logs will be inserted here -->
+                    <div class="py-1 border-b border-gray-800">
+                        <span class="text-gray-400" id="startup-time"></span>
+                        <span class="ml-2">Bot initialized and ready</span>
                     </div>
                 </div>
             </div>
@@ -849,6 +368,7 @@
     <script>
         // Global object to store the latest entry conditions by symbol
         const latestConditions = {};
+        const notificationSound = document.getElementById('notificationSound');
         
         // Format current time
         function updateCurrentTime() {
@@ -862,14 +382,27 @@
                 minute: '2-digit',
                 second: '2-digit'
             };
-            $('#current-time').html('<i class="far fa-clock mr-1"></i> ' + now.toLocaleString('en-US', options));
+            $('#current-time').text(now.toLocaleString('en-US', options));
+            
+            // Set startup time if not already set
+            if (!$('#startup-time').text()) {
+                $('#startup-time').text(now.toLocaleTimeString());
+            }
+        }
+        
+        // Play notification sound
+        function playNotification() {
+            notificationSound.play().catch(error => {
+                console.warn("Could not play notification sound:", error);
+            });
         }
         
         // Close notification on delete button click
         document.addEventListener('DOMContentLoaded', () => {
-            (document.querySelectorAll('.notification .delete') || []).forEach(($delete) => {
+            (document.querySelectorAll('.message-close') || []).forEach(($delete) => {
+                const $notification = $delete.parentNode;
                 $delete.addEventListener('click', () => {
-                    $delete.parentNode.remove();
+                    $notification.parentNode.removeChild($notification);
                 });
             });
             
@@ -879,45 +412,67 @@
             setInterval(updateCurrentTime, 1000);
         });
         
+        // Add log entry
+        function addLogEntry(message) {
+            const logs = document.getElementById('trade_logs');
+            const entry = document.createElement('div');
+            entry.className = 'py-1 border-b border-gray-800';
+            
+            // Get current time
+            const now = new Date();
+            
+            entry.innerHTML = `
+                <span class="text-gray-400">${now.toLocaleTimeString()}</span>
+                <span class="ml-2">${message}</span>
+            `;
+            logs.appendChild(entry);
+            logs.scrollTop = logs.scrollHeight;
+            
+            // Update last update timestamp
+            document.getElementById('last-update').textContent = `Last update: ${now.toLocaleTimeString()}`;
+        }
+        
         // Update open positions
         function updatePositions() {
-            $('#positions-container').addClass('data-loading');
+            $('#positions-container').addClass('opacity-50');
             
             $.get('/positions', function(data) {
                 let positionsHtml = '';
                 
                 if (data.length === 0) {
                     positionsHtml = `
-                        <div class="empty-state">
-                            <i class="fas fa-search fa-3x"></i>
-                            <p class="empty-state-text">No open positions</p>
+                        <div class="flex flex-col items-center justify-center py-8">
+                            <svg class="w-16 h-16 text-gray-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                            <p class="text-gray-400">No open positions</p>
                         </div>
                     `;
                 } else {
                     data.forEach(function(position) {
-                        const profitClass = position.profit_pct >= 0 ? 'profit' : 'loss';
+                        const profitClass = position.profit_pct >= 0 ? 'text-green-500' : 'text-red-500';
                         positionsHtml += `
-                            <div class="position-card">
-                                <div class="position-header">
-                                    <div class="position-symbol">${position.symbol}</div>
-                                    <div class="position-time">${position.entry_time}</div>
+                            <div class="bg-gray-800 rounded-lg p-4 animate-slide-in">
+                                <div class="flex justify-between items-center mb-3">
+                                    <h4 class="text-xl font-bold">${position.symbol}</h4>
+                                    <span class="${profitClass} text-lg">${position.profit_pct.toFixed(2)}%</span>
                                 </div>
-                                <div class="position-body">
-                                    <div class="position-data">
-                                        <div class="position-label">Entry</div>
-                                        <div class="position-value">${position.entry_price}</div>
+                                <div class="grid grid-cols-2 gap-2 text-sm">
+                                    <div>
+                                        <div class="text-gray-400 mb-1">Entry Price</div>
+                                        <div>${position.entry_price}</div>
                                     </div>
-                                    <div class="position-data">
-                                        <div class="position-label">Current</div>
-                                        <div class="position-value">${position.current_price}</div>
+                                    <div>
+                                        <div class="text-gray-400 mb-1">Current Price</div>
+                                        <div>${position.current_price}</div>
                                     </div>
-                                    <div class="position-data">
-                                        <div class="position-label">Quantity</div>
-                                        <div class="position-value">${position.quantity}</div>
+                                    <div>
+                                        <div class="text-gray-400 mb-1">Quantity</div>
+                                        <div>${position.quantity}</div>
                                     </div>
-                                    <div class="position-data">
-                                        <div class="position-label">Profit</div>
-                                        <div class="position-value ${profitClass}">${position.profit_pct.toFixed(2)}%</div>
+                                    <div>
+                                        <div class="text-gray-400 mb-1">Entry Time</div>
+                                        <div>${position.entry_time}</div>
                                     </div>
                                 </div>
                             </div>
@@ -926,57 +481,75 @@
                 }
                 
                 $('#positions-container').html(positionsHtml);
-                $('#positions-container').removeClass('data-loading');
+                $('#positions-container').removeClass('opacity-50');
+                addLogEntry("Updated open positions data");
+            }).fail(function() {
+                addLogEntry("Failed to update positions");
             });
         }
         
         // Update statistics
         function updateStats() {
-            $('#stats-container').addClass('data-loading');
+            $('#stats-container').addClass('opacity-50');
             
             $.get('/stats', function(data) {
-                const totalProfitClass = data.total_profit_pct >= 0 ? 'profit' : 'loss';
-                const avgProfitClass = data.average_profit_per_trade >= 0 ? 'profit' : 'loss';
+                const totalProfitClass = data.total_profit_pct >= 0 ? 'text-green-500' : 'text-red-500';
+                const avgProfitClass = data.average_profit_per_trade >= 0 ? 'text-green-500' : 'text-red-500';
+                
+                // Update small stats in control panel
+                $('#total-trades-count').text(data.total_trades);
+                $('#win-rate').text(`${data.win_rate.toFixed(1)}%`);
+                $('#total-profit').text(`${data.total_profit_pct.toFixed(2)}%`);
+                $('#total-profit').attr('class', `text-xl font-bold ${totalProfitClass}`);
                 
                 const statsHtml = `
-                    <table class="data-table">
-                        <tbody>
-                            <tr>
-                                <th>Total Trades</th>
-                                <td>${data.total_trades}</td>
-                            </tr>
-                            <tr>
-                                <th>Winning Trades</th>
-                                <td>${data.winning_trades}</td>
-                            </tr>
-                            <tr>
-                                <th>Losing Trades</th>
-                                <td>${data.losing_trades}</td>
-                            </tr>
-                            <tr>
-                                <th>Win Rate</th>
-                                <td>${data.win_rate.toFixed(2)}%</td>
-                            </tr>
-                            <tr>
-                                <th>Total Profit</th>
-                                <td class="${totalProfitClass}">${data.total_profit_pct.toFixed(2)}%</td>
-                            </tr>
-                            <tr>
-                                <th>Avg. Profit/Trade</th>
-                                <td class="${avgProfitClass}">${data.average_profit_per_trade.toFixed(2)}%</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div class="grid grid-cols-2 gap-6">
+                        <div class="bg-gray-800 p-4 rounded-lg">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <div class="text-gray-400 text-sm">Total Trades</div>
+                                    <div class="text-xl font-bold">${data.total_trades}</div>
+                                </div>
+                                <div>
+                                    <div class="text-gray-400 text-sm">Win Rate</div>
+                                    <div class="text-xl font-bold text-blue-500">${data.win_rate.toFixed(2)}%</div>
+                                </div>
+                                <div>
+                                    <div class="text-gray-400 text-sm">Winning Trades</div>
+                                    <div class="text-xl font-bold text-green-500">${data.winning_trades}</div>
+                                </div>
+                                <div>
+                                    <div class="text-gray-400 text-sm">Losing Trades</div>
+                                    <div class="text-xl font-bold text-red-500">${data.losing_trades}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-gray-800 p-4 rounded-lg">
+                            <div class="grid grid-cols-1 gap-4">
+                                <div>
+                                    <div class="text-gray-400 text-sm">Total Profit</div>
+                                    <div class="text-2xl font-bold ${totalProfitClass}">${data.total_profit_pct.toFixed(2)}%</div>
+                                </div>
+                                <div>
+                                    <div class="text-gray-400 text-sm">Avg. Profit/Trade</div>
+                                    <div class="text-2xl font-bold ${avgProfitClass}">${data.average_profit_per_trade.toFixed(2)}%</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 `;
                 
                 $('#stats-container').html(statsHtml);
-                $('#stats-container').removeClass('data-loading');
+                $('#stats-container').removeClass('opacity-50');
+                addLogEntry("Updated performance statistics");
+            }).fail(function() {
+                addLogEntry("Failed to update statistics");
             });
         }
         
         // Update trade history
         function updateHistory() {
-            $('#history-tbody').addClass('data-loading');
+            $('#history-tbody').addClass('opacity-50');
             
             $.get('/history', function(data) {
                 let historyHtml = '';
@@ -984,15 +557,17 @@
                 if (data.length === 0) {
                     historyHtml = `
                         <tr>
-                            <td colspan="5" class="text-center">No trade history</td>
+                            <td colspan="5" class="text-center py-8">
+                                <p class="text-gray-400">No trade history</p>
+                            </td>
                         </tr>
                     `;
                 } else {
                     data.slice().reverse().forEach(function(trade) {
-                        const profitClass = trade.profit_pct >= 0 ? 'profit' : 'loss';
+                        const profitClass = trade.profit_pct >= 0 ? 'text-green-500' : 'text-red-500';
                         historyHtml += `
-                            <tr>
-                                <td>${trade.symbol}</td>
+                            <tr class="border-b border-gray-800 hover:bg-gray-800/50">
+                                <td class="py-3">${trade.symbol}</td>
                                 <td>${trade.entry_price}</td>
                                 <td>${trade.exit_price}</td>
                                 <td class="${profitClass}">${trade.profit_pct.toFixed(2)}%</td>
@@ -1003,23 +578,25 @@
                 }
                 
                 $('#history-tbody').html(historyHtml);
-                $('#history-tbody').removeClass('data-loading');
+                $('#history-tbody').removeClass('opacity-50');
+                addLogEntry("Updated trade history");
+            }).fail(function() {
+                addLogEntry("Failed to update trade history");
             });
         }
         
         // Update entry conditions with persistent coin display
         function updateEntryConditions() {
-            $('#conditions-container').addClass('data-loading');
+            $('#conditions-container').addClass('opacity-50');
             
             $.get('/entry-conditions', function(data) {
                 if (data.length === 0) {
                     $('#conditions-container').html(`
-                        <div class="empty-state">
-                            <i class="fas fa-search fa-3x"></i>
-                            <p class="empty-state-text">No scan results yet</p>
+                        <div class="flex justify-center items-center py-8">
+                            <p class="text-gray-400">No scan results yet</p>
                         </div>
                     `);
-                    $('#conditions-container').removeClass('data-loading');
+                    $('#conditions-container').removeClass('opacity-50');
                     return;
                 }
                 
@@ -1052,47 +629,59 @@
                 
                 sortedSymbols.forEach(function(symbol) {
                     const condition = latestConditions[symbol];
-                    const signalClass = condition.entry_signal ? 'signal-buy' : '';
-                    const rsiClass = condition.rsi_condition ? 'has-text-success' : '';
-                    const macdClass = condition.macd_condition ? 'has-text-success' : '';
+                    const rsiClass = condition.rsi_condition ? 'text-green-500' : '';
+                    const macdClass = condition.macd_condition ? 'text-green-500' : '';
                     const flashClass = condition.updated ? 'flash-change' : '';
+                    const bgClass = condition.entry_signal ? 'bg-green-900/20' : '';
                     
                     // Clear the updated flag for next time
                     condition.updated = false;
                     
                     conditionsHtml += `
-                        <tr class="signal-row ${flashClass} ${signalClass}">
-                            <td class="symbol-cell">${symbol}</td>
-                            <td>${condition.price.toFixed(4)}</td>
-                            <td class="${rsiClass}">${condition.rsi.toFixed(1)}</td>
-                            <td class="${macdClass}">${condition.macd_histogram.toFixed(6)}</td>
-                            <td>
+                        <div class="grid grid-cols-5 gap-2 p-2 rounded ${flashClass} ${bgClass} hover:bg-gray-800/50">
+                            <div class="font-medium">${symbol.replace('USDT', '')}</div>
+                            <div class="text-right">${condition.price.toFixed(4)}</div>
+                            <div class="text-right ${rsiClass}">${condition.rsi.toFixed(1)}</div>
+                            <div class="text-right ${macdClass}">${condition.macd_histogram.toFixed(6)}</div>
+                            <div class="text-center">
                                 ${condition.entry_signal ? 
-                                    '<span class="tag tag-success">BUY</span>' : 
-                                    '<span class="tag tag-neutral">NO</span>'}
-                            </td>
-                        </tr>
+                                    '<span class="px-2 py-0.5 text-xs font-medium rounded-full bg-green-900 text-green-300">BUY</span>' : 
+                                    '<span class="px-2 py-0.5 text-xs rounded-full bg-gray-800 text-gray-400">--</span>'}
+                            </div>
+                        </div>
                     `;
                 });
                 
-                $('#conditions-container').html(`
-                    <table class="signal-table">
-                        <thead>
-                            <tr>
-                                <th>Symbol</th>
-                                <th>Price</th>
-                                <th>RSI</th>
-                                <th>MACD</th>
-                                <th>Signal</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${conditionsHtml}
-                        </tbody>
-                    </table>
-                `);
-                $('#conditions-container').removeClass('data-loading');
+                $('#conditions-container').html(conditionsHtml);
+                $('#conditions-container').removeClass('opacity-50');
+                addLogEntry("Updated entry conditions");
+                
+                // If there's a buy signal, play notification sound
+                const hasBuySignal = Object.values(latestConditions).some(c => c.updated && c.entry_signal);
+                if (hasBuySignal) {
+                    playNotification();
+                    addLogEntry("🔔 BUY signal detected!");
+                }
+            }).fail(function() {
+                addLogEntry("Failed to update entry conditions");
             });
+        }
+        
+        // Update progress bar animation
+        function updateScanProgress() {
+            const progress = $('#scan_progress');
+            let width = 0;
+            const interval = setInterval(() => {
+                if (width >= 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        progress.css('width', '0%');
+                    }, 500);
+                } else {
+                    width += 1;
+                    progress.css('width', width + '%');
+                }
+            }, 300);
         }
         
         // Update all data
@@ -1101,6 +690,7 @@
             updateStats();
             updateHistory();
             updateEntryConditions();
+            updateScanProgress();
         }
         
         // Update every 5 seconds if bot is running
@@ -1112,66 +702,6 @@
         // Initial data load
         $(document).ready(function() {
             updateData();
-        });
-    </script>
-</body>
-</html>
-                if(data.status === "success") {
-                    // Show notification
-                    const notification = `
-                        <div class="notification is-info">
-                            <button class="delete">&times;</button>
-                            Bot has been stopped.
-                        </div>
-                    `;
-                    
-                    // Insert notification at the top of main content
-                    $(notification).insertAfter('.header-bar');
-                    
-                    // Update status indicator
-                    $('.status-indicator').removeClass('active').addClass('inactive');
-                    $('#bot-status-text').text('Stopped');
-                    
-                    // Disable stop button, enable start button
-                    $('button[onclick="stopBot()"]').attr('disabled', true);
-                    $('.btn.btn-primary[type="submit"]').removeAttr('disabled');
-                    
-                    // Setup delete button functionality for the new notification
-                    $('.notification .delete').on('click', function() {
-                        $(this).parent().remove();
-                    });
-                }
-            });
-        }
-        
-        // Add click handler for switching between dashboard and settings
-        $(document).ready(function() {
-            // Initial data load
-            updateData();
-            
-            // Handle sidebar navigation
-            $('.sidebar-nav-link').on('click', function(e) {
-                e.preventDefault();
-                
-                // Remove active class from all links
-                $('.sidebar-nav-link').removeClass('active');
-                
-                // Add active class to clicked link
-                $(this).addClass('active');
-                
-                // If settings link clicked, show settings and hide dashboard
-                if($(this).attr('href') === '#settings-section') {
-                    $('#settings-section').show();
-                    $('.dashboard-grid').hide();
-                } else {
-                    // Otherwise show dashboard and hide settings
-                    $('#settings-section').hide();
-                    $('.dashboard-grid').show();
-                }
-            });
-            
-            // Initially hide settings since dashboard is active by default
-            $('#settings-section').hide();
         });
     </script>
 </body>

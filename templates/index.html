@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pathfinding Algorithms - Haroun Himeur</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+</head>
+<body>
+    <!-- Main App Header -->
+    <div class="app-header">
+        <div class="container">
+            <div class="app-title-container animate__animated animate__fadeIn">
+                <div class="app-title-icon">
+                    <i class="fas fa-project-diagram"></i>
+                </div>
+                <div class="app-title-text">
+                    <h1 class="title is-2">Pathfinding Algorithms</h1>
+                    <h2 class="subtitle is-4">Comparative Analysis: Dijkstra vs A*</h2>
+                    <div class="student-name-badge">Haroun Himeur</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Introduction Card -->
+    <section class="section pt-3 pb-2">
+        <div class="container">
+            <div class="card intro-card">
+                <div class="card-content">
+                    <div class="content">
+                        <p class="is-size-5">This interactive demonstration explores two fundamental pathfinding algorithms—<strong>Dijkstra's algorithm</strong> and <strong>A*</strong>—applied to real-world routing between <strong>Amizour</strong> and <strong>Bejaia</strong> in Algeria. Select an algorithm below to visualize the shortest path calculation.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Demo Section -->
+    <section id="demo-section" class="section pt-3">
+        <div class="container">
+            <div class="columns">
+                <!-- Controls -->
+                <div class="column is-4">
+                    <div class="box info-panel has-shadow">
+                        <div class="card-header-title is-centered mb-2">
+                            <span class="icon mr-2"><i class="fas fa-directions"></i></span>
+                            <span class="has-text-weight-bold is-size-4">Route Analysis</span>
+                        </div>
+                        
+                        <div class="route-details has-background-light p-4 mb-4 has-radius">
+                            <div class="level mb-2">
+                                <div class="level-left">
+                                    <div class="level-item">
+                                        <span class="icon is-medium has-text-success">
+                                            <i class="fas fa-map-marker-alt fa-lg"></i>
+                                        </span>
+                                    </div>
+                                    <div class="level-item">
+                                        <div>
+                                            <p class="heading">Starting Point</p>
+                                            <p class="title is-5">Amizour</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="has-text-centered py-2">
+                                <span class="icon has-text-grey-light">
+                                    <i class="fas fa-ellipsis-v fa-lg"></i>
+                                </span>
+                            </div>
+                            <div class="level mt-2">
+                                <div class="level-left">
+                                    <div class="level-item">
+                                        <span class="icon is-medium has-text-danger">
+                                            <i class="fas fa-map-pin fa-lg"></i>
+                                        </span>
+                                    </div>
+                                    <div class="level-item">
+                                        <div>
+                                            <p class="heading">Destination</p>
+                                            <p class="title is-5">Bejaia</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="algorithm-selection mb-5">
+                            <p class="subtitle is-5 has-text-centered">Choose Algorithm</p>
+                            <div class="algorithm-toggles">
+                                <div class="algorithm-toggle" id="toggle-dijkstra">
+                                    <div class="algorithm-toggle-inner is-active">
+                                        <span class="icon"><i class="fas fa-route"></i></span>
+                                        <h4>Dijkstra</h4>
+                                        <p class="algo-tag">Complete Search</p>
+                                    </div>
+                                </div>
+                                <div class="algorithm-toggle" id="toggle-astar">
+                                    <div class="algorithm-toggle-inner">
+                                        <span class="icon"><i class="fas fa-star"></i></span>
+                                        <h4>A*</h4>
+                                        <p class="algo-tag">Heuristic</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="field">
+                            <div class="control">
+                                <button id="find-path-btn" class="button is-primary is-medium is-fullwidth">
+                                    <span class="icon">
+                                        <i class="fas fa-search"></i>
+                                    </span>
+                                    <span>Calculate Shortest Path</span>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div id="loading" class="has-text-centered mt-4 is-hidden">
+                            <div class="loading-container">
+                                <div class="loading-spinner"></div>
+                                <p class="loading-text">Calculating optimal route...</p>
+                            </div>
+                        </div>
+                        
+                        <div id="path-info" class="path-results mt-5 is-hidden">
+                            <h4 class="title is-5 has-text-centered mb-4">Path Analysis</h4>
+                            
+                            <div class="result-item">
+                                <div class="result-icon has-background-info-light">
+                                    <i class="fas fa-ruler"></i>
+                                </div>
+                                <div class="result-data">
+                                    <div class="result-label">Distance</div>
+                                    <div class="result-value" id="distance-value">-</div>
+                                </div>
+                            </div>
+                            
+                            <div class="result-item">
+                                <div class="result-icon has-background-warning-light">
+                                    <i class="fas fa-code-branch"></i>
+                                </div>
+                                <div class="result-data">
+                                    <div class="result-label">Nodes Traversed</div>
+                                    <div class="result-value" id="nodes-value">-</div>
+                                </div>
+                            </div>
+                            
+                            <div class="result-item">
+                                <div class="result-icon has-background-primary-light">
+                                    <i class="fas fa-cogs"></i>
+                                </div>
+                                <div class="result-data">
+                                    <div class="result-label">Algorithm</div>
+                                    <div class="result-value" id="algorithm-value">-</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="student-info mt-5 pt-4 has-text-centered">
+                            <div class="student-signature">
+                                <span class="student-prefix">Developed by</span>
+                                <div class="student-name">Haroun Himeur</div>
+                            </div>
+                            <p class="student-course">Algorithms & Data Structures</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Map Panel -->
+                <div class="column is-8">
+                    <div class="map-panel">
+                        <div class="map-header">
+                            <h3 class="map-title">
+                                <span class="icon"><i class="fas fa-map"></i></span>
+                                Interactive Visualization
+                                <span class="map-subtitle">Amizour to Bejaia</span>
+                            </h3>
+                            <div class="map-legend">
+                                <div class="legend-item">
+                                    <span class="legend-color dijkstra-color"></span>
+                                    <span>Dijkstra's Path</span>
+                                </div>
+                                <div class="legend-item">
+                                    <span class="legend-color astar-color"></span>
+                                    <span>A* Path</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="map-container has-shadow">
+                            <div id="map">
+                                <div class="has-text-centered initial-map-message">
+                                    <div class="map-placeholder-icon">
+                                        <i class="fas fa-map-marked-alt"></i>
+                                    </div>
+                                    <p>Select an algorithm and click "Calculate Shortest Path" to begin</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Algorithm Comparison Section -->
+    <section id="comparison-section" class="section mt-4 algorithm-comparison-section has-background-light">
+        <div class="container">
+            <h2 class="title is-2 has-text-centered mb-6">
+                <span class="icon-text">
+                    <span class="icon has-text-primary">
+                        <i class="fas fa-exchange-alt"></i>
+                    </span>
+                    <span>Algorithm Comparison</span>
+                </span>
+            </h2>
+            
+            <div class="columns is-centered">
+                <div class="column is-5">
+                    <div class="comparison-card dijkstra">
+                        <div class="comparison-header">
+                            <div class="comparison-icon">
+                                <i class="fas fa-route"></i>
+                            </div>
+                            <h3 class="comparison-title">Dijkstra's Algorithm</h3>
+                        </div>
+                        <div class="comparison-body">
+                            <div class="comparison-feature">
+                                <span class="icon has-text-success"><i class="fas fa-check"></i></span>
+                                <span>Guarantees the shortest path</span>
+                            </div>
+                            <div class="comparison-feature">
+                                <span class="icon has-text-success"><i class="fas fa-check"></i></span>
+                                <span>Works with negative edges</span>
+                            </div>
+                            <div class="comparison-feature negative">
+                                <span class="icon has-text-danger"><i class="fas fa-times"></i></span>
+                                <span>Explores in all directions</span>
+                            </div>
+                            <div class="comparison-feature negative">
+                                <span class="icon has-text-danger"><i class="fas fa-times"></i></span>
+                                <span>Less efficient for long distances</span>
+                            </div>
+                            
+                            <div class="comparison-code">
+                                <pre><code>function dijkstra(graph, start, end):
+   distances[start] = 0
+   priorityQueue.add(start)
+   while priorityQueue not empty:
+      current = priorityQueue.extractMin()
+      if current == end:
+         return distances[current]
+      for each neighbor of current:
+         alt = distances[current] + weight(current, neighbor)
+         if alt < distances[neighbor]:
+            distances[neighbor] = alt
+            priorityQueue.add(neighbor)</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="column is-5">
+                    <div class="comparison-card astar">
+                        <div class="comparison-header">
+                            <div class="comparison-icon">
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <h3 class="comparison-title">A* Algorithm</h3>
+                        </div>
+                        <div class="comparison-body">
+                            <div class="comparison-feature">
+                                <span class="icon has-text-success"><i class="fas fa-check"></i></span>
+                                <span>Directed towards the goal</span>
+                            </div>
+                            <div class="comparison-feature">
+                                <span class="icon has-text-success"><i class="fas fa-check"></i></span>
+                                <span>Typically more efficient</span>
+                            </div>
+                            <div class="comparison-feature negative">
+                                <span class="icon has-text-danger"><i class="fas fa-times"></i></span>
+                                <span>Requires a heuristic function</span>
+                            </div>
+                            <div class="comparison-feature negative">
+                                <span class="icon has-text-danger"><i class="fas fa-times"></i></span>
+                                <span>Heuristic must be admissible</span>
+                            </div>
+                            
+                            <div class="comparison-code">
+                                <pre><code>function astar(graph, start, end):
+   openSet.add(start)
+   gScore[start] = 0
+   fScore[start] = heuristic(start, end)
+   while openSet not empty:
+      current = node in openSet with lowest fScore
+      if current == end:
+         return reconstruct_path(current)
+      openSet.remove(current)
+      for each neighbor of current:
+         tentative_gScore = gScore[current] + distance(current, neighbor)
+         if tentative_gScore < gScore[neighbor]:
+            cameFrom[neighbor] = current
+            gScore[neighbor] = tentative_gScore
+            fScore[neighbor] = gScore[neighbor] + heuristic(neighbor, end)
+            if neighbor not in openSet:
+               openSet.add(neighbor)</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="complexity-table-container mt-6">
+                <h3 class="title is-4 has-text-centered mb-4">Performance Complexity</h3>
+                <table class="table is-fullwidth complexity-table">
+                    <thead>
+                        <tr>
+                            <th>Algorithm</th>
+                            <th>Time Complexity</th>
+                            <th>Space Complexity</th>
+                            <th>Complete</th>
+                            <th>Optimal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Dijkstra</strong></td>
+                            <td>O((V + E) log V)</td>
+                            <td>O(V)</td>
+                            <td><span class="icon has-text-success"><i class="fas fa-check"></i></span></td>
+                            <td><span class="icon has-text-success"><i class="fas fa-check"></i></span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>A*</strong></td>
+                            <td>O(E)</td>
+                            <td>O(V)</td>
+                            <td><span class="icon has-text-success"><i class="fas fa-check"></i></span></td>
+                            <td><span class="icon has-text-warning"><i class="fas fa-asterisk"></i></span> With admissible heuristic</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="has-text-centered mt-5">
+                    <div class="author-footer">
+                        <span class="signature-icon"><i class="fas fa-code"></i></span>
+                        <span class="signature-name">Haroun Himeur</span>
+                        <span class="signature-divider">•</span>
+                        <span class="signature-course">Algorithm Analysis & Data Structures</span>
+                        <span class="signature-divider">•</span>
+                        <span class="signature-year">2023/2024</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
